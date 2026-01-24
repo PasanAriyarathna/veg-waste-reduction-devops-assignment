@@ -5,9 +5,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const PORT = 3000;
+
+// ===== DATABASE SETUP =====
+const db = new sqlite3.Database('./veg_waste.db', (err) => {
+    if (err) console.error(err.message);
+    else console.log('✅ Connected to SQLite Database');
+});
 
 // Middleware
 app.use(cors());
@@ -28,4 +35,4 @@ function isValidPassword(password) {
     return trimmed.length >= 6 && trimmed.length <= 128;
 }
 
-module.exports = { app, PORT, isValidEmail, isValidPassword };
+module.exports = { app, PORT, db, isValidEmail, isValidPassword };
