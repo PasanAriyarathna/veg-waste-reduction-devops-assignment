@@ -5,12 +5,33 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Render provides PORT
 const PUBLIC_DIR = path.join(__dirname, '../frontend');
-const DB_PATH = path.join(__dirname, '../veg_waste.db');
+const BASE_DB_PATH = path.join(__dirname, '../veg_waste.db');
+const TMP_DB_PATH = path.join('/tmp', 'veg_waste.db');
+const IS_VERCEL = !!process.env.VERCEL;
+const IS_RENDER = !!process.env.RENDER; // Render sets RENDER=true
+const USE_TMP_DB = IS_VERCEL || IS_RENDER;
+
+// On serverless or render, copy SQLite DB to /tmp (writeable) to avoid read-only errors
+const DB_PATH = (() => {
+    if (USE_TMP_DB) {
+        try {
+            if (!fs.existsSync(TMP_DB_PATH)) {
+                fs.copyFileSync(BASE_DB_PATH, TMP_DB_PATH);
+            }
+            return TMP_DB_PATH;
+        } catch (err) {
+            console.error('⚠️ Failed to prepare /tmp SQLite DB; falling back to base path', err);
+            return BASE_DB_PATH;
+        }
+    }
+    return BASE_DB_PATH;
+})();
 
 // Middleware
 app.use(cors());
@@ -356,14 +377,19 @@ app.get('/api/districts', (req, res) => {
 });
 
 // ===== SERVER START =====
-app.listen(PORT, () => {
-    console.log(`
-    =====================================
-    🥬 VEG WASTAGE REDUCTION SYSTEM
-    =====================================
-    ✅ Server running on http://localhost:${PORT}
-    ✅ Database: veg_waste.db
-    ✅ Ready to reduce wastage in Sri Lanka!
-    =====================================
-    `);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`
+        =====================================
+        🥬 VEG WASTAGE REDUCTION SYSTEM
+        =====================================
+        ✅ Server running on http://localhost:${PORT}
+        ✅ Database: ${IS_VERCEL ? TMP_DB_PATH : BASE_DB_PATH}
+        ✅ Ready to reduce wastage in Sri Lanka!
+        =====================================
+        `);
+    });
+}
+
+// Export app for serverless environments (e.g., Vercel)
+module.exports = app;
