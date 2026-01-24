@@ -151,4 +151,35 @@ function setupCropsEndpoint(app) {
   });
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint };
+/**
+ * Fetch monthly production trends
+ * GET /api/doa/monthly-trends
+ * Query: ?district=Badulla&crop=Beans&year=2025
+ */
+function setupMonthlyTrendsEndpoint(app) {
+  app.get('/api/doa/monthly-trends', async (req, res) => {
+    try {
+      const { district, crop, year } = req.query;
+
+      const response = await axios.get(
+        `${DOA_API_CONFIG.baseUrl}/monthly-trends`,
+        {
+          headers: {
+            'Authorization': `Bearer ${DOA_API_CONFIG.authToken}`,
+            'X-API-Key': DOA_API_CONFIG.apiKey
+          },
+          params: { district, crop, year },
+          timeout: DOA_API_CONFIG.timeout
+        }
+      );
+
+      res.json(response.data);
+
+    } catch (error) {
+      console.error('Error fetching monthly trends:', error);
+      res.status(500).json({ error: 'Failed to fetch monthly trends' });
+    }
+  });
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint };
