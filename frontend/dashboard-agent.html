@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Dashboard - VegWaste</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .dashboard-header {
+      background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(27, 122, 61, 0.2);
+    }
+    
+    .dashboard-header h1 {
+      margin: 0 0 10px 0;
+      font-size: 2.5em;
+      color: white;
+    }
+    
+    .dashboard-header p {
+      margin: 0;
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    
+    .district-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 20px;
+      border-radius: 20px;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border-left: 5px solid #1b7a3d;
+      transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-icon {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #1b7a3d;
+      margin: 10px 0;
+    }
+    
+    .stat-label {
+      color: #7f8c8d;
+      font-size: 0.95em;
+    }
+    
+    .responsibilities-section {
+      margin-bottom: 40px;
+    }
+    
+    .responsibilities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+    
+    .responsibility-box {
+      background: white;
+      padding: 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 2px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 380px;
+      justify-content: space-between;
+    }
+    
+    .responsibility-box:hover {
+      border-color: #27a047;
+      transform: translateY(-12px);
+      box-shadow: 0 16px 45px rgba(39, 160, 71, 0.25);
+      background: linear-gradient(135deg, #f8fff9 0%, #f0fef6 100%);
+    }
+    
+    .resp-icon {
+      font-size: 4.5em;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+    
+    .responsibility-box:hover .resp-icon {
+      transform: scale(1.2) rotate(-5deg);
+    }
+    
+    .responsibility-box h3 {
+      color: #2c3e50;
+      margin: 15px 0;
+      font-size: 1.4em;
+    }
+    
+    .responsibility-box p {
+      color: #7f8c8d;
+      margin: 15px 0 30px 0;
+      line-height: 1.7;
+      flex-grow: 1;
+      font-size: 1.05em;
+    }
+    
+    .resp-link-btn {
+      background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+      color: white;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-block;
+      font-size: 1.05em;
+    }
+    
+    .responsibility-box:hover .resp-link-btn {
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(27, 122, 61, 0.4);
+    }
+    
+    .quick-actions {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .quick-actions h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <span class="emoji">🥬</span>
+        <span class="text">VegWaste Sri Lanka</span>
+      </div>
+      <div class="nav-menu">
+        <a href="dashboard-agent.html" class="nav-link active">Dashboard</a>
+        <a href="category.html" class="nav-link">Update Harvest</a>
+        <a href="district-tracking.html" class="nav-link">View All Districts</a>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>👨‍🌾 Agent Dashboard</h1>
+      <p id="agentGreeting"></p>
+      <div class="district-badge" id="districtBadge"></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-value" id="totalEntries">0</div>
+        <div class="stat-label">Total Data Entries</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🥕</div>
+        <div class="stat-value" id="vegetableTypes">8</div>
+        <div class="stat-label">Vegetable Categories</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value">Real-time</div>
+        <div class="stat-label">Chart Updates</div>
+      </div>
+    </div>
+
+    <div class="responsibilities-section">
+      <h2 style="color: #2c3e50; margin-bottom: 25px; text-align: center;">🎯 Your Responsibilities</h2>
+      <div class="responsibilities-grid">
+        <div class="responsibility-box" onclick="goToUpdateHarvest()">
+          <div class="resp-icon">📊</div>
+          <h3>Update Harvest Quantities</h3>
+          <p>Update harvest quantities for vegetables in your district</p>
+          <span class="resp-link-btn">Go to Updates</span>
+        </div>
+        <div class="responsibility-box" onclick="viewDataAccuracy()">
+          <div class="resp-icon">✓</div>
+          <h3>Ensure Data Accuracy</h3>
+          <p>Ensure data accuracy for better wastage tracking</p>
+          <span class="resp-link-btn">View Submissions</span>
+        </div>
+        <div class="responsibility-box" onclick="openQuickSubmit()">
+          <div class="resp-icon">📤</div>
+          <h3>Submit Harvest Data</h3>
+          <p>Submit harvest data regularly for real-time monitoring</p>
+          <span class="resp-link-btn">Submit Now</span>
+        </div>
+        <div class="responsibility-box" onclick="viewDistrictTrends()">
+          <div class="resp-icon">📈</div>
+          <h3>View Charts & Trends</h3>
+          <p>View charts to track trends in your district</p>
+          <span class="resp-link-btn">View Charts</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <h2>📋 Recent Activity</h2>
+      <p style="color: #7f8c8d;">Select a vegetable from the Categories page to view and update harvest data. Charts will automatically refresh every 3 seconds to show your latest updates.</p>
+      
+      <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+        <h4 style="margin-top: 0; color: #2c3e50;">💡 Quick Tips:</h4>
+        <ul style="color: #5a6c7d; line-height: 2;">
+          <li>Click on any vegetable to see its harvest chart</li>
+          <li>You can only update data for <strong id="districtName2"></strong></li>
+          <li>Charts update automatically - no need to refresh the page</li>
+          <li>All your changes are saved immediately to the database</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Data Accuracy Check -->
+  <div id="accuracyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h2 style="margin: 0; color: #2c3e50;">✓ Your Recent Submissions</h2>
+        <button onclick="closeModal('accuracyModal')" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">✕</button>
+      </div>
+      <div id="accuracyContent" style="color: #5a6c7d; line-height: 1.8;"></div>
+    </div>
+  </div>
+
+  <!-- Modal for Quick Submit -->
+  <div id="quickSubmitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h2 style="margin: 0; color: #2c3e50;">📤 Quick Harvest Submit</h2>
+        <button onclick="closeModal('quickSubmitModal')" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">✕</button>
+      </div>
+      <form onsubmit="submitQuickHarvest(event)" style="display: flex; flex-direction: column; gap: 15px;">
+        <div>
+          <label style="display: block; color: #2c3e50; font-weight: 600; margin-bottom: 8px;">Vegetable:</label>
+          <select id="quickVeg" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; cursor: pointer;" required>
+            <option value="">Select a vegetable...</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; color: #2c3e50; font-weight: 600; margin-bottom: 8px;">Quantity (kg):</label>
+          <input type="number" id="quickQuantity" step="0.1" min="0" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em;" placeholder="Enter quantity" required>
+        </div>
+        <div>
+          <label style="display: block; color: #2c3e50; font-weight: 600; margin-bottom: 8px;">Harvest Date:</label>
+          <input type="date" id="quickDate" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em;" required>
+        </div>
+        <div id="submitMessage" style="display: none; padding: 12px; border-radius: 8px; margin-top: 10px;"></div>
+        <button type="submit" style="background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1em;">Submit Harvest Data</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal for District Trends -->
+  <div id="trendsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h2 style="margin: 0; color: #2c3e50;">📈 Your District Trends</h2>
+        <button onclick="closeModal('trendsModal')" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">✕</button>
+      </div>
+      <div id="trendsContent" style="color: #5a6c7d; line-height: 1.8;"></div>
+    </div>
+  </div>
+
+  <script>
+    function logout(){ 
+      if(confirm('Are you sure you want to logout?')){ 
+        localStorage.removeItem('user'); 
+        location.href='index.html'; 
+      } 
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || user.role !== 'agent') { 
+      alert('Agent access only'); 
+      location.href='signin.html'; 
+    }
+
+    // Update dashboard with user info
+    document.getElementById('agentGreeting').innerHTML = `Welcome, <strong>${user.name}</strong>`;
+    document.getElementById('districtBadge').textContent = `📍 ${user.district} District`;
+    document.getElementById('districtName2').textContent = user.district;
+
+    // Load statistics
+    async function loadStats() {
+      try {
+        // Get total entries for this agent's district
+        const response = await fetch('/api/vegetables');
+        const vegetables = await response.json();
+        
+        document.getElementById('vegetableTypes').textContent = vegetables.length;
+        
+        // Count total entries across all vegetables for this district
+        let totalEntries = 0;
+        for (const veg of vegetables) {
+          const harvestRes = await fetch(`/api/harvest/${veg.id}`);
+          const harvestData = await harvestRes.json();
+          const districtData = harvestData.filter(d => 
+            d.district.toLowerCase() === user.district.toLowerCase()
+          );
+          totalEntries += districtData.length;
+        }
+        
+        document.getElementById('totalEntries').textContent = totalEntries;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    loadStats();
+
+    // Responsibility Functions
+    function goToUpdateHarvest() {
+      window.location.href = 'category.html';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    async function viewDataAccuracy() {
+      const modal = document.getElementById('accuracyModal');
+      const content = document.getElementById('accuracyContent');
+      modal.style.display = 'flex';
+      content.innerHTML = '<p style="text-align: center;">Loading your submissions...</p>';
+
+      try {
+        const response = await fetch(`/api/harvest?userId=${user.id}&limit=10`);
+        const submissions = await response.json();
+
+        if (!submissions || submissions.length === 0) {
+          content.innerHTML = '<p style="text-align: center; color: #999;">No submissions yet. Start by clicking "Submit Now"!</p>';
+          return;
+        }
+
+        let html = `<div style="display: flex; flex-direction: column; gap: 15px;">`;
+        submissions.forEach((sub, idx) => {
+          const date = new Date(sub.harvest_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const submitted = new Date(sub.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          html += `
+            <div style="padding: 15px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #27a047;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <h4 style="margin: 0 0 8px 0; color: #2c3e50;">${sub.vegetable_name}</h4>
+                  <p style="margin: 0; color: #7f8c8d;"><strong>Quantity:</strong> ${sub.quantity} kg</p>
+                  <p style="margin: 0; color: #7f8c8d;"><strong>Harvest Date:</strong> ${date}</p>
+                  <p style="margin: 0; color: #999; font-size: 0.9em;"><strong>Submitted:</strong> ${submitted}</p>
+                </div>
+                <span style="background: #e8f5e9; color: #2e7d32; padding: 8px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9em;">✓ Recorded</span>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        content.innerHTML = html;
+      } catch (error) {
+        console.error('Error loading submissions:', error);
+        content.innerHTML = '<p style="color: #c62828;">❌ Failed to load submissions</p>';
+      }
+    }
+
+    async function openQuickSubmit() {
+      const modal = document.getElementById('quickSubmitModal');
+      modal.style.display = 'flex';
+
+      // Set today's date as default
+      document.getElementById('quickDate').valueAsDate = new Date();
+
+      // Load vegetables into dropdown
+      try {
+        const response = await fetch('/api/vegetables');
+        const vegetables = await response.json();
+        const select = document.getElementById('quickVeg');
+        select.innerHTML = '<option value="">Select a vegetable...</option>';
+        vegetables.forEach(veg => {
+          const option = document.createElement('option');
+          option.value = veg.id;
+          option.textContent = `${veg.emoji} ${veg.name}`;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading vegetables:', error);
+      }
+    }
+
+    async function submitQuickHarvest(event) {
+      event.preventDefault();
+      const vegId = document.getElementById('quickVeg').value;
+      const quantity = parseFloat(document.getElementById('quickQuantity').value);
+      const date = document.getElementById('quickDate').value;
+      const messageDiv = document.getElementById('submitMessage');
+
+      if (!vegId || !quantity || quantity <= 0 || !date) {
+        messageDiv.style.display = 'block';
+        messageDiv.style.backgroundColor = '#ffebee';
+        messageDiv.style.color = '#c62828';
+        messageDiv.textContent = '❌ Please fill all fields with valid data';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/harvest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            vegetableId: parseInt(vegId),
+            district: user.district,
+            quantity: quantity,
+            harvestDate: date,
+            userId: user.id
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to submit');
+
+        messageDiv.style.display = 'block';
+        messageDiv.style.backgroundColor = '#e8f5e9';
+        messageDiv.style.color = '#2e7d32';
+        messageDiv.textContent = '✅ Harvest data submitted successfully!';
+
+        document.getElementById('quickVeg').value = '';
+        document.getElementById('quickQuantity').value = '';
+        document.getElementById('quickDate').valueAsDate = new Date();
+
+        setTimeout(() => {
+          closeModal('quickSubmitModal');
+          loadStats();
+        }, 1500);
+      } catch (error) {
+        console.error('Error submitting:', error);
+        messageDiv.style.display = 'block';
+        messageDiv.style.backgroundColor = '#ffebee';
+        messageDiv.style.color = '#c62828';
+        messageDiv.textContent = '❌ Error submitting data. Please try again.';
+      }
+    }
+
+    async function viewDistrictTrends() {
+      const modal = document.getElementById('trendsModal');
+      const content = document.getElementById('trendsContent');
+      modal.style.display = 'flex';
+      content.innerHTML = '<p style="text-align: center;">Loading district trends...</p>';
+
+      try {
+        const response = await fetch('/api/vegetables');
+        const vegetables = await response.json();
+
+        let html = `<h3 style="color: #2c3e50; margin-top: 0;">📊 Harvest Summary for ${user.district}</h3>`;
+        html += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
+
+        for (const veg of vegetables) {
+          const harvestRes = await fetch(`/api/harvest/${veg.id}`);
+          const harvestData = await harvestRes.json();
+          const districtData = harvestData.filter(d => 
+            d.district.toLowerCase() === user.district.toLowerCase()
+          );
+
+          const totalQty = districtData.reduce((sum, d) => sum + d.quantity, 0);
+
+          html += `
+            <div style="padding: 15px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid #1b7a3d;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h4 style="margin: 0 0 6px 0; color: #2c3e50;">${veg.emoji} ${veg.name}</h4>
+                  <p style="margin: 0; color: #7f8c8d; font-size: 0.95em;">Total recorded: <strong>${totalQty.toFixed(1)} kg</strong> across ${districtData.length} submissions</p>
+                </div>
+                <span style="background: #e3f2fd; color: #1565c0; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9em;">${districtData.length}</span>
+              </div>
+            </div>
+          `;
+        }
+
+        html += '</div>';
+        content.innerHTML = html;
+      } catch (error) {
+        console.error('Error loading trends:', error);
+        content.innerHTML = '<p style="color: #c62828;">❌ Failed to load trends</p>';
+      }
+    }
+  </script>
