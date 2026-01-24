@@ -68,10 +68,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             } else {
                 alert('❌ ' + (data.error || 'Login failed. Please try again.'));
             }
-            if (loginSubmitBtn) {
-                loginSubmitBtn.disabled = false;
-                loginSubmitBtn.textContent = 'Sign In';
-            }
+            loginSubmitBtn.disabled = false;
+            loginSubmitBtn.textContent = 'Sign In';
             return;
         }
 
@@ -106,10 +104,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         } else {
             alert('❌ Network error. Please check your connection.');
         }
-        if (loginSubmitBtn) {
-            loginSubmitBtn.disabled = false;
-            loginSubmitBtn.textContent = 'Sign In';
-        }
+        loginSubmitBtn.disabled = false;
+        loginSubmitBtn.textContent = 'Sign In';
     }
 });
 
