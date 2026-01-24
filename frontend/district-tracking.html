@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District Production Tracking - VegWaste</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <style>
+        .tracking-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .tracking-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tracking-header h1 {
+            color: var(--primary-green);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .tracking-header p {
+            color: #666;
+            font-size: 1.05em;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--primary-green);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .control-group select {
+            padding: 10px 15px;
+            border: 2px solid var(--primary-green);
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .control-group select:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(27, 122, 61, 0.3);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .map-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .map-section h3 {
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2em;
+        }
+
+        #districtMap {
+            height: 500px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .data-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .data-section h3 {
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .district-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .district-card h4 {
+            color: var(--primary-green);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .district-card .info {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .production-bar {
+            width: 100%;
+            height: 25px;
+            background: #e8e8e8;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .production-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green) 0%, var(--light-green) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .stat-card .label {
+            font-size: 0.8em;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4ff 0%, #d1ecf1 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-blue);
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #districtMap {
+                height: 400px;
+            }
+
+            .controls {
+                grid-template-columns: auto auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tracking-header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .control-group select {
+                min-width: 100%;
+            }
+
+            #districtMap {
+                height: 300px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="emoji">🥬</span>
+                <span class="text">VegWaste Sri Lanka</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="signin.html" class="nav-link">Sign In</a>
+                <a href="category.html" class="nav-link">Categories</a>
+                <a href="seasonal-guide.html" class="nav-link">Seasons Guide</a>
+                <a href="seasonal-tracking.html" class="nav-link">Season Map</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="tracking-container">
+        <!-- Header -->
+        <div class="tracking-header">
+            <h1>🗺️ District Production Tracking</h1>
+            <p>Monitor vegetable production across Sri Lankan districts. Data integrates with DOA CROPIX for real-time production metrics and seasonal trends.</p>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="controls">
+            <div class="control-group">
+                <label for="seasonSelect">Season</label>
+                <select id="seasonSelect">
+                    <option value="maha">Maha (Sep-Mar)</option>
+                    <option value="yala">Yala (May-Aug)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="zoneSelect">Zone</label>
+                <select id="zoneSelect">
+                    <option value="all">All Zones</option>
+                    <option value="upCountry">Up-Country</option>
+                    <option value="lowCountry">Low-Country</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="vegetableSelect">Vegetable</label>
+                <select id="vegetableSelect">
+                    <option value="all">All Vegetables</option>
+                    <option value="potato">Potato</option>
+                    <option value="tomato">Tomato</option>
+                    <option value="onion">Onion</option>
+                    <option value="carrot">Carrot</option>
+                    <option value="brinjal">Brinjal</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="yearSelect">Year</label>
+                <select id="yearSelect">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <strong>📊 Demo Data:</strong> This page displays simulated production data based on historical Sri Lankan agricultural patterns. When connected to DOA CROPIX API, it will show real production figures, seasonal targets, and actual vs projected comparisons.
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number" id="totalDistricts">22</div>
+                <div class="label">Districts Tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="totalProduction">3.2K</div>
+                <div class="label">MT Total Production</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="avgProduction">145</div>
+                <div class="label">MT Average per District</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="topProducer">Badulla</div>
+                <div class="label">Leading District</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Map Section -->
+            <div class="map-section">
+                <h3>📍 District Locations</h3>
+                <div id="districtMap"></div>
+            </div>
+
+            <!-- Data Section -->
+            <div class="data-section">
+                <h3>📈 Production Data</h3>
+                <div id="districtList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: var(--primary-green); color: white; text-align: center; padding: 30px; margin-top: 40px;">
+        <p>&copy; 2026 VegWaste Sri Lanka. Supporting sustainable vegetable production with real-time agricultural data.</p>
+    </footer>
+
+    <script>
+        // Demo data structure based on Sri Lankan agricultural patterns
+        const districtData = {
+            'Nuwara Eliya': {
+                lat: 6.9271, lng: 80.7789,
+                zone: 'upCountry',
+                vegetables: ['Potato', 'Carrot', 'Green Beans', 'Leeks', 'Cabbage'],
+                mahaProduction: 285, // MT
+                yalaProduction: 45,
+                mainCrop: 'Potato'
+            },
+            'Badulla': {
+                lat: 6.9881, lng: 81.2680,
+                zone: 'upCountry',
+                vegetables: ['Beans', 'Carrot', 'Potato', 'Onion', 'Tomato'],
+                mahaProduction: 320,
+                yalaProduction: 80,
+                mainCrop: 'Beans'
+            },
+            'Kandy': {
+                lat: 7.2906, lng: 80.6337,
+                zone: 'upCountry',
+                vegetables: ['Cabbage', 'Beetroot', 'Beans', 'Potato', 'Leafy Greens'],
+                mahaProduction: 210,
+                yalaProduction: 50,
+                mainCrop: 'Cabbage'
+            },
+            'Matale': {
+                lat: 7.4662, lng: 80.6300,
+                zone: 'upCountry',
+                vegetables: ['Carrot', 'Cabbage', 'Beans', 'Onion', 'Tomato'],
+                mahaProduction: 195,
+                yalaProduction: 65,
+                mainCrop: 'Carrot'
+            },
+            'Colombo': {
+                lat: 6.9271, lng: 79.8612,
+                zone: 'lowCountry',
+                vegetables: ['Brinjal', 'Okra', 'Tomato', 'Long Beans'],
+                mahaProduction: 120,
+                yalaProduction: 150,
+                mainCrop: 'Tomato'
+            },
+            'Gampaha': {
+                lat: 7.0833, lng: 80.0333,
+                zone: 'lowCountry',
+                vegetables: ['Brinjal', 'Long Beans', 'Okra', 'Pumpkin'],
+                mahaProduction: 105,
+                yalaProduction: 140,
+                mainCrop: 'Brinjal'
+            },
+            'Kalutara': {
+                lat: 6.5898, lng: 80.3257,
+                zone: 'lowCountry',
+                vegetables: ['Okra', 'Long Beans', 'Brinjal', 'Tomato'],
+                mahaProduction: 95,
+                yalaProduction: 130,
+                mainCrop: 'Okra'
+            },
+            'Ratnapura': {
+                lat: 6.6828, lng: 80.3975,
+                zone: 'lowCountry',
+                vegetables: ['Long Beans', 'Okra', 'Pumpkin', 'Brinjal'],
+                mahaProduction: 85,
+                yalaProduction: 110,
+                mainCrop: 'Long Beans'
+            },
+            'Kegalle': {
+                lat: 7.2577, lng: 80.7500,
+                zone: 'lowCountry',
+                vegetables: ['Brinjal', 'Long Beans', 'Tomato', 'Okra'],
+                mahaProduction: 90,
+                yalaProduction: 125,
+                mainCrop: 'Brinjal'
+            },
+            'Jaffna': {
+                lat: 9.6615, lng: 80.1855,
+                zone: 'lowCountry',
+                vegetables: ['Tomato', 'Okra', 'Long Beans', 'Onion'],
+                mahaProduction: 110,
+                yalaProduction: 95,
+                mainCrop: 'Tomato'
+            },
+            'Mullaitivu': {
+                lat: 8.6128, lng: 81.8165,
+                zone: 'lowCountry',
+                vegetables: ['Tomato', 'Okra', 'Brinjal', 'Long Beans'],
+                mahaProduction: 75,
+                yalaProduction: 85,
+                mainCrop: 'Okra'
+            },
+            'Batticaloa': {
+                lat: 7.7102, lng: 81.6924,
+                zone: 'lowCountry',
+                vegetables: ['Long Beans', 'Tomato', 'Okra', 'Pumpkin'],
+                mahaProduction: 88,
+                yalaProduction: 102,
+                mainCrop: 'Long Beans'
+            },
+            'Trincomalee': {
+                lat: 8.5711, lng: 81.2264,
+                zone: 'lowCountry',
+                vegetables: ['Tomato', 'Long Beans', 'Okra', 'Brinjal'],
+                mahaProduction: 80,
+                yalaProduction: 92,
+                mainCrop: 'Tomato'
+            },
+            'Ampara': {
+                lat: 7.2980, lng: 81.6703,
+                zone: 'lowCountry',
+                vegetables: ['Pumpkin', 'Cucumber', 'Brinjal', 'Okra'],
+                mahaProduction: 92,
+                yalaProduction: 98,
+                mainCrop: 'Pumpkin'
+            },
+            'Moneragala': {
+                lat: 6.8517, lng: 81.3495,
+                zone: 'lowCountry',
+                vegetables: ['Pumpkin', 'Brinjal', 'Onion', 'Okra'],
+                mahaProduction: 70,
+                yalaProduction: 85,
+                mainCrop: 'Pumpkin'
+            },
+            'Matara': {
+                lat: 5.7487, lng: 80.5353,
+                zone: 'lowCountry',
+                vegetables: ['Okra', 'Brinjal', 'Long Beans', 'Tomato'],
+                mahaProduction: 78,
+                yalaProduction: 105,
+                mainCrop: 'Okra'
+            },
+            'Galle': {
+                lat: 6.0535, lng: 80.2170,
+                zone: 'lowCountry',
+                vegetables: ['Brinjal', 'Long Beans', 'Okra', 'Pumpkin'],
+                mahaProduction: 82,
+                yalaProduction: 110,
+                mainCrop: 'Brinjal'
+            },
+            'Hambantota': {
+                lat: 6.1247, lng: 81.1165,
+                zone: 'lowCountry',
+                vegetables: ['Pumpkin', 'Okra', 'Tomato', 'Long Beans'],
+                mahaProduction: 60,
+                yalaProduction: 95,
+                mainCrop: 'Pumpkin'
+            },
+            'Anuradhapura': {
+                lat: 8.3141, lng: 80.4237,
+                zone: 'lowCountry',
+                vegetables: ['Onion', 'Tomato', 'Long Beans', 'Okra'],
+                mahaProduction: 100,
+                yalaProduction: 115,
+                mainCrop: 'Onion'
+            },
+            'Polonnaruwa': {
+                lat: 7.9408, lng: 81.0061,
+                zone: 'lowCountry',
+                vegetables: ['Tomato', 'Onion', 'Long Beans', 'Brinjal'],
+                mahaProduction: 105,
+                yalaProduction: 120,
+                mainCrop: 'Tomato'
+            },
+            'Kurunegala': {
+                lat: 7.4833, lng: 80.6333,
+                zone: 'lowCountry',
+                vegetables: ['Tomato', 'Okra', 'Long Beans', 'Onion'],
+                mahaProduction: 95,
+                yalaProduction: 115,
+                mainCrop: 'Tomato'
+            },
+            'Puttalam': {
+                lat: 8.0327, lng: 79.8310,
+                zone: 'lowCountry',
+                vegetables: ['Long Beans', 'Okra', 'Tomato', 'Onion'],
+                mahaProduction: 88,
+                yalaProduction: 105,
+                mainCrop: 'Long Beans'
+            }
+        };
+
+        let map;
+        let markers = [];
+        let currentSeason = 'maha';
+        let currentZone = 'all';
+        let currentVegetable = 'all';
+
+        // Initialize map
+        function initMap() {
+            map = L.map('districtMap').setView([7.8731, 80.7718], 7);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            updateMap();
+        }
+
+        // Update map display
+        function updateMap() {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            Object.entries(districtData).forEach(([district, data]) => {
+                // Filter by zone
+                if (currentZone !== 'all' && data.zone !== currentZone) return;
+
+                const production = currentSeason === 'maha' ? data.mahaProduction : data.yalaProduction;
+                const color = production > 200 ? '#0d5c2e' : production > 100 ? '#27a047' : '#81c995';
+                
+                const circle = L.circleMarker([data.lat, data.lng], {
+                    radius: 15 + (production / 20),
+                    fillColor: color,
+                    color: '#1b7a3d',
+                    weight: 2,
+                    opacity: 0.8,
+                    fillOpacity: 0.7
+                }).addTo(map);
+
+                circle.bindPopup(`
+                    <strong>${district}</strong><br>
+                    Production: ${production} MT<br>
+                    Main Crop: ${data.mainCrop}<br>
+                    Zone: ${data.zone === 'upCountry' ? 'Up-Country' : 'Low-Country'}
+                `);
+
+                markers.push(circle);
+            });
+        }
+
+        // Update district list
+        function updateDistrictList() {
+            const listDiv = document.getElementById('districtList');
+            listDiv.innerHTML = '';
+
+            const filteredDistricts = Object.entries(districtData)
+                .filter(([_, data]) => currentZone === 'all' || data.zone === currentZone)
+                .sort((a, b) => {
+                    const prodA = currentSeason === 'maha' ? a[1].mahaProduction : a[1].yalaProduction;
+                    const prodB = currentSeason === 'maha' ? b[1].mahaProduction : b[1].yalaProduction;
+                    return prodB - prodA;
+                });
+
+            filteredDistricts.forEach(([district, data]) => {
+                const production = currentSeason === 'maha' ? data.mahaProduction : data.yalaProduction;
+                const maxProduction = Math.max(...filteredDistricts.map(d => 
+                    currentSeason === 'maha' ? d[1].mahaProduction : d[1].yalaProduction
+                ));
+                const percentage = (production / maxProduction) * 100;
+
+                const card = document.createElement('div');
+                card.className = 'district-card';
+                card.innerHTML = `
+                    <h4>${district}</h4>
+                    <div class="info">
+                        <div><strong>Production:</strong> ${production} MT</div>
+                        <div><strong>Main Crop:</strong> ${data.mainCrop}</div>
+                        <div><strong>Vegetables:</strong> ${data.vegetables.slice(0, 3).join(', ')}</div>
+                    </div>
+                    <div class="production-bar">
+                        <div class="production-fill" style="width: ${percentage}%; min-width: 30px;">
+                            ${percentage.toFixed(0)}%
+                        </div>
+                    </div>
+                `;
+                listDiv.appendChild(card);
+            });
+        }
+
+        // Event listeners
+        document.getElementById('seasonSelect').addEventListener('change', (e) => {
+            currentSeason = e.target.value;
+            updateMap();
+            updateDistrictList();
+        });
+
+        document.getElementById('zoneSelect').addEventListener('change', (e) => {
+            currentZone = e.target.value;
+            updateMap();
+            updateDistrictList();
+        });
+
+        // Initialize
+        initMap();
+        updateDistrictList();
+    </script>
+</body>
+</html>

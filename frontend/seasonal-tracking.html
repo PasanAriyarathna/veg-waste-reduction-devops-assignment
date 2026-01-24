@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seasonal Vegetable Tracking - VegWaste</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <style>
+        .seasonal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .season-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+
+        .season-btn {
+            padding: 12px 30px;
+            border: 2px solid #1b7a3d;
+            background: white;
+            color: #1b7a3d;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .season-btn.active {
+            background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+            color: white;
+        }
+
+        .season-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(27, 122, 61, 0.2);
+        }
+
+        .season-info {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #1b7a3d;
+        }
+
+        .season-info h3 {
+            color: #1b7a3d;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 10px;
+        }
+
+        .season-info p {
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        .vegetables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .veg-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-top: 3px solid #1b7a3d;
+        }
+
+        .veg-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(27, 122, 61, 0.15);
+        }
+
+        .veg-emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .veg-name {
+            color: #1b7a3d;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .veg-districts {
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .veg-loss {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 6px;
+            color: #856404;
+            font-size: 0.85em;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+
+        .district-zones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .zone-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid #1b7a3d;
+        }
+
+        .zone-card h3 {
+            color: #1b7a3d;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .zone-card ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .zone-card li {
+            padding: 8px 0;
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 1px solid #eee;
+        }
+
+        .zone-card li:last-child {
+            border-bottom: none;
+        }
+
+        .stats-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            border-top: 4px solid #1b7a3d;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            color: #1b7a3d;
+            font-size: 2em;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .stat-label {
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin: 30px 0;
+        }
+
+        .timeline-item {
+            padding-left: 30px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            background: #1b7a3d;
+            border-radius: 50%;
+        }
+
+        .timeline-item h4 {
+            color: #1b7a3d;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item p {
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+
+        /* Map Section Styles */
+        .map-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            border-top: 4px solid #1b7a3d;
+        }
+
+        .map-section h2 {
+            color: #1b7a3d;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        #seasonalMap {
+            width: 100%;
+            height: 500px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #seasonalMap .leaflet-container {
+            height: 100%;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .district-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .district-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #1b7a3d;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .district-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(27, 122, 61, 0.2);
+            background: linear-gradient(135deg, #e8f5e9 0%, #d4edda 100%);
+        }
+
+        .district-card h4 {
+            color: #1b7a3d;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .district-card p {
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .district-vegetables {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .veg-tag {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #1b7a3d;
+            border: 1px solid #1b7a3d;
+            font-weight: 500;
+        }
+
+        .map-legend {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .map-legend h4 {
+            color: #1b7a3d;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 15px;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-item p {
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .filter-zone {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .zone-filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #1b7a3d;
+            background: white;
+            color: #1b7a3d;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .zone-filter-btn.active {
+            background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+            color: white;
+        }
+
+        .zone-filter-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .season-selector {
+                flex-direction: column;
+            }
+
+            .vegetables-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .district-zones {
+                grid-template-columns: 1fr;
+            }
+
+            #seasonalMap {
+                height: 350px;
+            }
+
+            .filter-zone {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="emoji">🥬</span>
+                <span class="text">VegWaste Sri Lanka</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="signin.html" class="nav-link">Sign In</a>
+                <a href="category.html" class="nav-link">Categories</a>
+                <a href="seasonal-tracking.html" class="nav-link active">Seasons</a>
+                <a href="district-map.html" class="nav-link">Map</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="seasonal-container">
+        <!-- Page Header -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="color: var(--primary-green); font-family: 'Playfair Display', serif; font-size: 2.8em; margin-bottom: 10px;">🌾 Sri Lanka Cultivation & Harvest Seasons</h1>
+            <p style="color: #666; font-size: 1.1em; font-family: 'Inter', sans-serif;">Practical guide to vegetable seasons, growing areas & post-harvest insights</p>
+        </div>
+
+        <!-- Season Selector -->
+        <div class="season-selector">
+            <button class="season-btn active" onclick="switchSeason('maha')">
+                🌧️ Maha Season (Sep - Mar)
+            </button>
+            <button class="season-btn" onclick="switchSeason('yala')">
+                ☀️ Yala Season (May - Aug)
+            </button>
+        </div>
+
+        <!-- Season Information -->
+        <div id="seasonInfo" class="season-info">
+            <h3>Maha Season (September - March)</h3>
+            <p><strong>Linked with North-East monsoon</strong> – The primary cultivation season across Sri Lanka. Peak planting and harvesting occur during this period, especially in up-country vegetable regions and irrigation-supported areas.</p>
+            <div style="margin-top: 15px; padding: 15px; background: rgba(27, 122, 61, 0.05); border-left: 4px solid var(--primary-green); border-radius: 8px;">
+                <strong style="color: var(--primary-green);">Key Insight:</strong> Up-country vegetables flourish during this season due to favorable monsoon rains and cooler temperatures. Low-country areas also see increased production with irrigation support.
+            </div>
+        </div>
+
+        <!-- Interactive Map Section -->
+        <div class="map-section">
+            <h2>🗺️ Sri Lanka District Cultivation Map</h2>
+            <div class="filter-zone">
+                <span style="color: #1b7a3d; font-weight: 600; font-family: 'Poppins', sans-serif;">Filter by Zone:</span>
+                <button class="zone-filter-btn active" onclick="filterByZone('all')">All Districts</button>
+                <button class="zone-filter-btn" onclick="filterByZone('upCountry')">❄️ Up-Country</button>
+                <button class="zone-filter-btn" onclick="filterByZone('lowCountry')">🌡️ Low-Country</button>
+            </div>
+            <div id="seasonalMap"></div>
+            <div class="map-legend">
+                <h4>📊 Harvest Quantity Legend</h4>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-circle" style="background: #d4edda; border: 2px solid #1b7a3d;"></div>
+                        <p><strong>Low Harvest:</strong> 0-500 units</p>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-circle" style="background: #27a047; border: 2px solid #1b7a3d;"></div>
+                        <p><strong>Medium Harvest:</strong> 500-1500 units</p>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-circle" style="background: #0d5c2e; border: 2px solid #1b7a3d;"></div>
+                        <p><strong>High Harvest:</strong> 1500+ units</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- District Details Section -->
+        <h2 style="color: #1b7a3d; margin-bottom: 20px; margin-top: 40px; font-family: 'Poppins', sans-serif;">📍 District-Wise Vegetable Details</h2>
+        <div id="districtDetailsList" class="district-details">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- Vegetables in Season -->
+        <h2 style="color: #1b7a3d; margin-bottom: 20px; margin-top: 40px; font-family: 'Poppins', sans-serif;">Vegetables Currently in Season</h2>
+        <div id="vegetablesList" class="vegetables-grid">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- Growing Zones -->
+        <h2 style="color: #1b7a3d; margin-bottom: 20px; margin-top: 40px; font-family: 'Poppins', sans-serif;">Major Vegetable Growing Zones</h2>
+        <div class="district-zones">
+            <div class="zone-card">
+                <h3>❄️ Up-Country (Cool Climate)</h3>
+                <ul>
+                    <li>📍 Nuwara Eliya</li>
+                    <li>📍 Badulla</li>
+                    <li>📍 Kandy</li>
+                    <li>📍 Matale</li>
+                    <li>🥔 Potato, Carrot</li>
+                    <li>🥬 Cabbage, Leeks</li>
+                    <li>🫘 Beans, Beetroot</li>
+                </ul>
+            </div>
+
+            <div class="zone-card">
+                <h3>🌡️ Low-Country (Warm Climate)</h3>
+                <ul>
+                    <li>📍 Multiple Districts</li>
+                    <li>📍 Wet/Intermediate/Dry Zones</li>
+                    <li>🍆 Brinjal/Eggplant</li>
+                    <li>🫘 Long Beans, Okra</li>
+                    <li>🎃 Pumpkin, Cucumber</li>
+                    <li>🥒 Bitter Gourd, Luffa</li>
+                    <li>Year-round (with irrigation)</li>
+                </ul>
+            </div>
+
+            <div class="zone-card">
+                <h3>🌍 Other Key Areas</h3>
+                <ul>
+                    <li>📍 Colombo District</li>
+                    <li>📍 Gampaha District</li>
+                    <li>📍 Kalutara District</li>
+                    <li>🍅 Tomato (most zones)</li>
+                    <li>🧅 Onion</li>
+                    <li>🥕 Root Vegetables</li>
+                    <li>Irrigation availability varies</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-section">
+            <h3>Post-Harvest Loss & Waste Management</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">20-40%</div>
+                    <div class="stat-label">Vegetable Waste</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">35%</div>
+                    <div class="stat-label">Fruits & Veg Loss</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Agro-Climatic Zones</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Main Seasons</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Loss Causes -->
+        <div class="stats-section">
+            <h3>Common Post-Harvest Loss Causes</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>🚚 Transport Damage</h4>
+                    <p>Poor packaging and over-stacking during transportation causes significant losses across the supply chain.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>🌡️ Temperature Exposure</h4>
+                    <p>Lack of cold chain infrastructure leads to spoilage, especially in warm climates of low-country zones.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>🏪 Handling at Wholesale/Retail</h4>
+                    <p>Poor storage practices and handling at markets and retail points contribute to quality degradation.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>📦 Storage Conditions</h4>
+                    <p>Inadequate storage facilities with improper temperature and humidity control accelerate deterioration.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seasonal Timeline -->
+        <div class="stats-section">
+            <h3>Annual Cultivation Timeline</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>January - March</h4>
+                    <p>End of Maha season. Harvesting peak for main crops. Transition planting begins for Yala season in some areas.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>April - May</h4>
+                    <p>Short inter-season period. Yala season planting begins. Some areas continue extended Maha harvesting.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>May - August</h4>
+                    <p>Yala season (dry season cultivation). Strong irrigation-dependent production. Low-country vegetables peak.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>September - December</h4>
+                    <p>Maha season begins with North-East monsoon. Peak planting period. Up-country vegetables flourish.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background: #1b7a3d; color: white; text-align: center; padding: 20px; margin-top: 40px;">
+        <p>&copy; 2026 VegWaste Sri Lanka. Seasonal cultivation tracking for sustainable vegetable production.</p>
+    </footer>
+
+    <script>
+        let seasonalMapInstance = null;
+        let markersLayer = null;
+        let currentZoneFilter = 'all';
+
+        // District coordinates and metadata
+        const districtMetadata = {
+            'Nuwara Eliya': { lat: 6.9497, lng: 80.7891, zone: 'upCountry', vegetables: ['Potato', 'Carrot', 'Cabbage', 'Leeks', 'Beans', 'Beetroot'], emoji: '❄️' },
+            'Badulla': { lat: 6.9934, lng: 81.2706, zone: 'upCountry', vegetables: ['Carrot', 'Potato', 'Beans', 'Onion', 'Tomato'], emoji: '🏔️' },
+            'Kandy': { lat: 7.2906, lng: 80.6337, zone: 'upCountry', vegetables: ['Cabbage', 'Beans', 'Beetroot', 'Potato', 'Leeks'], emoji: '🌿' },
+            'Matale': { lat: 7.7674, lng: 80.7854, zone: 'upCountry', vegetables: ['Carrot', 'Cabbage', 'Beans', 'Onion', 'Tomato'], emoji: '🌾' },
+            'Colombo': { lat: 6.9271, lng: 80.6369, zone: 'lowCountry', vegetables: ['Brinjal', 'Okra', 'Tomato', 'Cucumber', 'Pumpkin'], emoji: '🏙️' },
+            'Gampaha': { lat: 7.0896, lng: 80.6500, zone: 'lowCountry', vegetables: ['Brinjal', 'Long Beans', 'Okra', 'Tomato', 'Lettuce'], emoji: '🌳' },
+            'Kalutara': { lat: 6.5881, lng: 80.3516, zone: 'lowCountry', vegetables: ['Pumpkin', 'Cucumber', 'Bitter Gourd', 'Tomato', 'Brinjal'], emoji: '🌴' },
+            'Ratnapura': { lat: 6.6828, lng: 80.3938, zone: 'lowCountry', vegetables: ['Long Beans', 'Okra', 'Tomato', 'Brinjal', 'Pumpkin'], emoji: '💎' },
+            'Kegalle': { lat: 7.2554, lng: 80.3425, zone: 'upCountry', vegetables: ['Potato', 'Carrot', 'Beans', 'Tomato', 'Onion'], emoji: '🥔' },
+            'Jaffna': { lat: 9.6615, lng: 80.0255, zone: 'lowCountry', vegetables: ['Onion', 'Tomato', 'Brinjal', 'Okra', 'Lettuce'], emoji: '🌊' },
+            'Mullaitivu': { lat: 8.2957, lng: 81.8963, zone: 'lowCountry', vegetables: ['Tomato', 'Okra', 'Brinjal', 'Long Beans', 'Cucumber'], emoji: '🏖️' },
+            'Batticaloa': { lat: 7.7102, lng: 81.7895, zone: 'lowCountry', vegetables: ['Okra', 'Brinjal', 'Long Beans', 'Tomato', 'Pumpkin'], emoji: '🌊' },
+            'Trincomalee': { lat: 8.5874, lng: 81.2329, zone: 'lowCountry', vegetables: ['Tomato', 'Brinjal', 'Okra', 'Cucumber', 'Long Beans'], emoji: '⛱️' },
+            'Ampara': { lat: 7.2996, lng: 81.7065, zone: 'lowCountry', vegetables: ['Long Beans', 'Okra', 'Brinjal', 'Tomato', 'Pumpkin'], emoji: '🌴' },
+            'Moneragala': { lat: 6.8667, lng: 81.2500, zone: 'lowCountry', vegetables: ['Onion', 'Tomato', 'Brinjal', 'Okra', 'Beans'], emoji: '🗻' },
+            'Matara': { lat: 5.7479, lng: 80.5353, zone: 'lowCountry', vegetables: ['Pumpkin', 'Cucumber', 'Tomato', 'Brinjal', 'Okra'], emoji: '🏖️' },
+            'Galle': { lat: 6.0535, lng: 80.2170, zone: 'lowCountry', vegetables: ['Brinjal', 'Okra', 'Pumpkin', 'Tomato', 'Cucumber'], emoji: '🏰' },
+            'Hambantota': { lat: 6.1256, lng: 81.1242, zone: 'lowCountry', vegetables: ['Tomato', 'Onion', 'Brinjal', 'Okra', 'Pumpkin'], emoji: '🌊' },
+            'Anuradhapura': { lat: 8.3163, lng: 80.4165, zone: 'lowCountry', vegetables: ['Onion', 'Tomato', 'Potato', 'Long Beans', 'Okra'], emoji: '🙏' },
+            'Polonnaruwa': { lat: 7.9400, lng: 81.0033, zone: 'lowCountry', vegetables: ['Tomato', 'Onion', 'Long Beans', 'Brinjal', 'Okra'], emoji: '🏛️' },
+            'Kurunegala': { lat: 7.4818, lng: 80.3635, zone: 'lowCountry', vegetables: ['Onion', 'Tomato', 'Long Beans', 'Brinjal', 'Okra'], emoji: '🥜' },
+            'Puttalam': { lat: 8.0340, lng: 79.8277, zone: 'lowCountry', vegetables: ['Tomato', 'Okra', 'Long Beans', 'Onion', 'Brinjal'], emoji: '🌾' }
+        };
+
+        // Seasonal vegetable data
+        const seasonalData = {
+            maha: {
+                title: 'Maha Season (September - March)',
+                description: 'The main cultivation season linked with the North-East monsoon. This period sees peak vegetable cultivation across Sri Lanka, especially in the up-country vegetable belt and irrigation-supported areas. Weather conditions are ideal for most vegetable crops.',
+                vegetables: [
+                    { name: 'Potato', emoji: '🥔', districts: 'Nuwara Eliya, Badulla, Kandy', loss: '15-20%' },
+                    { name: 'Carrot', emoji: '🥕', districts: 'Badulla, Nuwara Eliya, Matale', loss: '10-15%' },
+                    { name: 'Cabbage', emoji: '🥬', districts: 'Kandy, Matale, Nuwara Eliya', loss: '15-25%' },
+                    { name: 'Leeks', emoji: '🧅', districts: 'Up-Country Region', loss: '20-25%' },
+                    { name: 'Beans', emoji: '🫘', districts: 'Kandy, Badulla, Matale', loss: '15-20%' },
+                    { name: 'Beetroot', emoji: '🥬', districts: 'Nuwara Eliya, Kandy', loss: '15-20%' },
+                    { name: 'Brinjal', emoji: '🍆', districts: 'Multiple districts', loss: '20-30%' },
+                    { name: 'Tomato', emoji: '🍅', districts: 'All agro-climatic zones', loss: '25-35%' }
+                ]
+            },
+            yala: {
+                title: 'Yala Season (May - August)',
+                description: 'The dry season cultivation period. This season relies heavily on irrigation systems. Production is strong in low-country zones and areas with established irrigation infrastructure. Vegetables grown are mainly suited to warm climates.',
+                vegetables: [
+                    { name: 'Brinjal', emoji: '🍆', districts: 'All Dry Zone districts', loss: '20-30%' },
+                    { name: 'Long Beans', emoji: '🫘', districts: 'Intermediate & Dry zones', loss: '15-25%' },
+                    { name: 'Okra', emoji: '🌳', districts: 'Low-Country region', loss: '20-30%' },
+                    { name: 'Pumpkin', emoji: '🎃', districts: 'Multiple districts', loss: '15-20%' },
+                    { name: 'Cucumber', emoji: '🥒', districts: 'Irrigation areas', loss: '20-35%' },
+                    { name: 'Bitter Gourd', emoji: '🫒', districts: 'Dry & Intermediate zones', loss: '25-35%' },
+                    { name: 'Luffa', emoji: '🌳', districts: 'Low-Country zones', loss: '15-25%' },
+                    { name: 'Tomato', emoji: '🍅', districts: 'All zones (with irrigation)', loss: '25-35%' }
+                ]
+            }
+        };
+
+        function initSeasonalMap() {
+            // Remove existing map if present
+            if (seasonalMapInstance) {
+                seasonalMapInstance.remove();
+                seasonalMapInstance = null;
+            }
+            
+            // Wait for DOM to be ready
+            const mapContainer = document.getElementById('seasonalMap');
+            if (!mapContainer) {
+                console.error('Map container not found');
+                return;
+            }
+            
+            // Initialize the map
+            try {
+                seasonalMapInstance = L.map('seasonalMap').setView([7.8731, 80.7718], 7);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(seasonalMapInstance);
+
+                // Initialize markers layer
+                markersLayer = L.featureGroup().addTo(seasonalMapInstance);
+                
+                // Display district markers
+                displayDistrictMarkers();
+                
+                console.log('Map initialized successfully');
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        }
+
+        function displayDistrictMarkers() {
+            if (!markersLayer) return;
+            
+            markersLayer.clearLayers();
+            
+            Object.entries(districtMetadata).forEach(([district, metadata]) => {
+                // Check zone filter
+                if (currentZoneFilter !== 'all' && metadata.zone !== currentZoneFilter) {
+                    return;
+                }
+
+                // Fetch harvest data for this district
+                const totalVegetables = metadata.vegetables.length;
+                let markerColor = '#d4edda'; // low
+                
+                if (totalVegetables > 7) {
+                    markerColor = '#0d5c2e'; // high
+                } else if (totalVegetables > 4) {
+                    markerColor = '#27a047'; // medium
+                }
+
+                const markerSize = 30 + (totalVegetables * 2);
+                
+                const html = `
+                    <div style="
+                        background: ${markerColor};
+                        width: ${markerSize}px;
+                        height: ${markerSize}px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+                        color: white;
+                        border: 3px solid white;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                        font-size: 14px;
+                        cursor: pointer;
+                    ">
+                        ${metadata.emoji}
+                    </div>
+                `;
+
+                const customIcon = L.divIcon({
+                    html: html,
+                    iconSize: [markerSize, markerSize],
+                    className: ''
+                });
+
+                const marker = L.marker([metadata.lat, metadata.lng], { icon: customIcon })
+                    .bindPopup(`
+                        <div style="font-family: 'Poppins', sans-serif; padding: 10px;">
+                            <h3 style="color: #1b7a3d; margin: 0 0 10px 0;">${district}</h3>
+                            <p style="margin: 5px 0; color: #666; font-size: 0.9em;">
+                                <strong>Zone:</strong> ${metadata.zone === 'upCountry' ? '❄️ Up-Country' : '🌡️ Low-Country'}
+                            </p>
+                            <p style="margin: 5px 0; color: #666; font-size: 0.9em;">
+                                <strong>Vegetables:</strong> ${totalVegetables}
+                            </p>
+                            <p style="margin: 5px 0; color: #666; font-size: 0.85em;">
+                                ${metadata.vegetables.slice(0, 3).join(', ')}<br/>
+                                ${metadata.vegetables.length > 3 ? `+ ${metadata.vegetables.length - 3} more` : ''}
+                            </p>
+                        </div>
+                    `)
+                    .on('click', () => scrollToDistrict(district))
+                    .addTo(markersLayer);
+            });
+        }
+
+        function filterByZone(zone) {
+            currentZoneFilter = zone;
+            
+            // Update active button
+            document.querySelectorAll('.zone-filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Redraw markers
+            displayDistrictMarkers();
+        }
+
+        function scrollToDistrict(district) {
+            const card = document.querySelector(`[data-district="${district}"]`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                card.style.animation = 'pulse 0.5s ease-in-out';
+            }
+        }
+
+        function updateDistrictDetails(season) {
+            const detailsList = document.getElementById('districtDetailsList');
+            const detailsHtml = Object.entries(districtMetadata)
+                .map(([district, data]) => {
+                    const vegetables = data.vegetables.slice(0, 5);
+                    return `
+                        <div class="district-card" data-district="${district}">
+                            <h4>${data.emoji} ${district}</h4>
+                            <p><strong style="color: #1b7a3d;">Zone:</strong> ${data.zone === 'upCountry' ? '❄️ Up-Country' : '🌡️ Low-Country'}</p>
+                            <div class="district-vegetables">
+                                ${vegetables.map(veg => `<span class="veg-tag">${veg}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+            
+            detailsList.innerHTML = detailsHtml;
+        }
+
+        function switchSeason(season) {
+            // Update active button
+            document.querySelectorAll('.season-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            // Update season info
+            const data = seasonalData[season];
+            document.getElementById('seasonInfo').innerHTML = `
+                <h3>${data.title}</h3>
+                <p>${data.description}</p>
+            `;
+
+            // Update vegetables list
+            const vegList = document.getElementById('vegetablesList');
+            vegList.innerHTML = data.vegetables.map(veg => `
+                <div class="veg-item">
+                    <div class="veg-emoji">${veg.emoji}</div>
+                    <div class="veg-name">${veg.name}</div>
+                    <div class="veg-districts">📍 ${veg.districts}</div>
+                    <div class="veg-loss">⚠️ Post-Harvest Loss: ${veg.loss}</div>
+                </div>
+            `).join('');
+
+            // Refresh map only if it's initialized
+            if (markersLayer) {
+                displayDistrictMarkers();
+            }
+        }
+
+        // Initialize with Maha season
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                initSeasonalMap();
+                updateDistrictDetails('maha');
+                switchSeason('maha');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

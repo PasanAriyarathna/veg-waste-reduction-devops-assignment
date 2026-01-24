@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - VegWaste</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="emoji">🥬</span>
+                <span class="text">VegWaste Sri Lanka</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="signin.html" class="nav-link">Sign In</a>
+                <a href="category.html" class="nav-link active">Categories</a>
+                <button class="nav-link btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>🥬 Vegetable Categories</h1>
+            <p id="userGreeting">Welcome back!</p>
+        </div>
+
+        <!-- Recent Updates Section for Agents -->
+        <div id="recentUpdatesSection" style="display: none; margin-bottom: 40px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">📝 Your Recent Updates</h2>
+            <div id="recentUpdatesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                <!-- Recent updates will be loaded here -->
+            </div>
+        </div>
+
+        <div id="vegetablesCategoriesContainer" class="vegetables-grid">
+            <!-- Vegetables will be loaded here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Update Modal for Agents -->
+    <div id="updateModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 id="modalTitle">Update Harvest Quantity</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <!-- LEFT COLUMN: UPDATE FORM -->
+                <div style="border-right: 1px solid #e0e0e0; padding-right: 20px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">📝 Add New Update</h3>
+                    <form id="harvestForm" onsubmit="submitHarvestData(event)">
+                        <div class="form-group" style="display: block;">
+                            <label for="modalVegetable">Vegetable:</label>
+                            <input type="text" id="modalVegetable" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+                        </div>
+                        <div class="form-group" style="display: block;">
+                            <label for="modalDistrict">District:</label>
+                            <input type="text" id="modalDistrict" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+                        </div>
+                        <div class="form-group" style="display: block;">
+                            <label for="modalQuantity">Harvest Quantity (kg):</label>
+                            <input type="number" id="modalQuantity" required min="0" step="0.01" placeholder="Enter quantity in kg">
+                        </div>
+                        <div class="form-group" style="display: block;">
+                            <label for="modalDate">Harvest Date:</label>
+                            <input type="date" id="modalDate" required>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 12px;">
+                            <button type="submit" class="btn btn-primary" style="flex: 1;">📊 Submit Data</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">Cancel</button>
+                        </div>
+                    </form>
+                    <div id="modalMessage" style="display: none; margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600;"></div>
+                </div>
+
+                <!-- RIGHT COLUMN: RECENT UPDATES -->
+                <div style="padding-left: 20px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">📋 Your Recent Updates</h3>
+                    <div id="vegetableUpdatesList" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+                        <!-- Updates will be loaded here -->
+                    </div>
+                    <div id="noUpdatesMessage" style="text-align: center; color: #999; padding: 30px 10px; display: none;">
+                        <p style="font-size: 1.1em;">No updates yet for this vegetable</p>
+                        <p style="font-size: 0.9em;">Your submissions will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="category.js"></script>
+</body>
+</html>

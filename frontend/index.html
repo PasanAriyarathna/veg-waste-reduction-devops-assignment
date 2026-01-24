@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VegWaste - Reduce Vegetable Wastage</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="emoji">🥬</span>
+                <span class="text">VegWaste</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="category.html" class="nav-link">Categories</a>
+                <a href="district-tracking.html" class="nav-link">District Tracking</a>
+            </div>
+            <button class="btn-signup" onclick="window.location.href='signin.html'">Sign In</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-new">
+        <div class="hero-left">
+            <h1 class="hero-title">Reducing Vegetable Wastage in Sri Lanka</h1>
+            <p class="hero-subtitle">We are bringing across South Central Agriculture supply chain visibility</p>
+            
+            <div class="cta-buttons">
+                <button class="btn-get-app" onclick="alert('iOS App Coming Soon')">
+                    <span style="font-size: 1.5em;">🍎</span>
+                </button>
+                <button class="btn-get-app" onclick="alert('Android App Coming Soon')">
+                    <span style="font-size: 1.5em;">🤖</span>
+                </button>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <span class="search-icon">📍</span>
+                    <input type="text" id="searchDistrict" placeholder="Your City" class="search-input">
+                    <button class="btn-search" onclick="searchByDistrict()">
+                        <span>🔍</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="image-grid mosaic">
+                <div class="image-item wide">
+                    <img src="images/beans.jpg" alt="Beans" loading="lazy" decoding="async">
+                </div>
+                <div class="image-item tall">
+                    <img src="images/leeks.jpeg" alt="Leeks" loading="lazy" decoding="async" onerror="this.src='images/Leeks.webp'">
+                </div>
+                <div class="image-item square">
+                    <img src="images/carrot.jpeg" alt="Carrot" loading="lazy" decoding="async">
+                </div>
+                <div class="image-item square">
+                    <img src="images/potato.jpg" alt="Potato" loading="lazy" decoding="async">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Real-time Charts</h3>
+                <p>Visualize harvest data across different districts in real-time</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👨‍🌾</div>
+                <h3>Employee Dashboard</h3>
+                <p>Employees can update harvest quantities and manage data</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Customer View</h3>
+                <p>Customers can view harvest data without editing rights</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <h3>District Map View</h3>
+                <p>Interactive map showing vegetable production across 22 districts</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌾</div>
+                <h3>Agricultural Guide</h3>
+                <p>Comprehensive cultivation & harvest seasons data from DOA</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Sign In</h3>
+                <p>Register as an Employee or Customer</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Browse Categories</h3>
+                <p>View all available vegetables</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Update/View Data</h3>
+                <p>Employees update, Customers view</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Analyze Charts</h3>
+                <p>Make informed decisions with data</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 VegWaste Sri Lanka. Reducing agricultural wastage for a sustainable future.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        function searchByDistrict() {
+            const district = document.getElementById('searchDistrict').value;
+            if (district.trim()) {
+                window.location.href = `district-tracking.html?district=${encodeURIComponent(district)}`;
+            } else {
+                alert('Please enter a district name');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Update navbar based on login status
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const signInBtn = document.querySelector('.btn-signup');
+            
+            if (user) {
+                // User is logged in - show logout button
+                signInBtn.textContent = 'Logout';
+                signInBtn.onclick = logout;
+            } else {
+                // Not logged in - show sign in button
+                signInBtn.textContent = 'Sign In';
+                signInBtn.onclick = () => window.location.href = 'signin.html';
+            }
+        });
+    </script>
+</body>
+</html>

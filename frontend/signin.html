@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - VegWaste</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        
+        .auth-box {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .auth-header {
+            background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .auth-header h2 {
+            color: white;
+            margin: 0 0 10px 0;
+            font-size: 2em;
+        }
+        
+        .auth-header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .auth-body {
+            padding: 40px 30px;
+        }
+        
+        .role-selection {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 0;
+        }
+        
+        .role-btn {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1em;
+        }
+        
+        .role-icon {
+            font-size: 2.5em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #f5f5f5;
+        }
+        
+        .role-content h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+        
+        .role-content p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        
+        .customer-btn:hover {
+            border-color: #ff5722;
+            background: #fff3e0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 87, 34, 0.2);
+        }
+        
+        .customer-btn:hover .role-icon {
+            background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);
+            color: white;
+        }
+        
+        .agent-btn:hover {
+            border-color: #27a047;
+            background: #f0fdf4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(39, 160, 71, 0.2);
+        }
+        
+        .agent-btn:hover .role-icon {
+            background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+            color: white;
+        }
+        
+        .admin-btn:hover {
+            border-color: #673ab7;
+            background: #f3e5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(103, 58, 183, 0.2);
+        }
+        
+        .admin-btn:hover .role-icon {
+            background: linear-gradient(135deg, #673ab7 0%, #9c27b0 100%);
+            color: white;
+        }
+        
+        .form-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            color: #1b7a3d;
+            border-bottom-color: #1b7a3d;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1b7a3d;
+            box-shadow: 0 0 0 4px rgba(27, 122, 61, 0.1);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(27, 122, 61, 0.3);
+        }
+        
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 0.95em;
+        }
+        
+        .back-button:hover {
+            color: #1b7a3d;
+        }
+        
+        .form-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #1565c0;
+        }
+        
+        .highlight-box {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .highlight-box h4 {
+            margin: 0 0 10px 0;
+            color: #e65100;
+        }
+        
+        .highlight-box p {
+            margin: 0;
+            color: #f57c00;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="emoji">🥬</span>
+                <span class="text">VegWaste Sri Lanka</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h2>🥬 Welcome to VegWaste</h2>
+                <p>Choose your role to get started</p>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Role Selection -->
+                <div id="roleSelection" class="role-selection">
+                    <button class="role-btn customer-btn" onclick="selectRole('customer')">
+                        <div class="role-icon">👥</div>
+                        <div class="role-content">
+                            <h3>Customer</h3>
+                            <p>View harvest data and vegetable information</p>
+                        </div>
+                    </button>
+                    
+                    <button class="role-btn agent-btn" onclick="selectRole('agent')">
+                        <div class="role-icon">👨‍🌾</div>
+                        <div class="role-content">
+                            <h3>Agent</h3>
+                            <p>Update harvest data for your district</p>
+                        </div>
+                    </button>
+                    
+                    <button class="role-btn admin-btn" onclick="selectRole('admin')">
+                        <div class="role-icon">🛠️</div>
+                        <div class="role-content">
+                            <h3>Admin</h3>
+                            <p>Manage agents and system settings</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Auth Forms -->
+                <div id="authForms" style="display: none;">
+                    <!-- Form Tabs -->
+                    <div class="form-tabs" id="formTabs">
+                        <button class="tab-button active" onclick="switchTab('login')" id="loginTabBtn">Login</button>
+                        <button class="tab-button" onclick="switchTab('register')" id="registerTabBtn">Sign Up</button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div id="loginForm" class="tab-content active">
+                        <form onsubmit="handleLogin(event)">
+                            <div class="form-group">
+                                <label for="loginEmail">Email Address</label>
+                                <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Password</label>
+                                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                            </div>
+                            <div id="loginError" class="form-error" style="display:none;"></div>
+                            <button type="submit" class="btn-primary" id="loginSubmitBtn">Sign In</button>
+                        </form>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div id="registerForm" class="tab-content" style="display: none;">
+                        <div id="customerRegister">
+                            <div class="highlight-box">
+                                <h4>✨ New Customer?</h4>
+                                <p>Create your account to view harvest data</p>
+                            </div>
+                            <form onsubmit="handleRegister(event)">
+                                <div class="form-group">
+                                    <label for="regName">Full Name</label>
+                                    <input type="text" id="regName" placeholder="Your full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="regEmail">Email Address</label>
+                                    <input type="email" id="regEmail" placeholder="your@email.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="regPhone">Phone Number</label>
+                                    <input type="tel" id="regPhone" placeholder="+94 70 1234567" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="regPassword">Password</label>
+                                    <input type="password" id="regPassword" placeholder="Minimum 6 characters" required>
+                                </div>
+                                <div id="regError" class="form-error" style="display:none;"></div>
+                                <button type="submit" class="btn-primary">Create Account</button>
+                            </form>
+                        </div>
+                        
+                        <div id="agentAdminInfo" style="display: none;">
+                            <div class="form-info">
+                                📝 Agent and Admin accounts cannot be created here. Please contact your administrator.
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#" class="back-button" onclick="goBack(); return false;">← Back to role selection</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        let selectedRole = null;
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.getElementById('roleSelection').style.display = 'none';
+            document.getElementById('authForms').style.display = 'block';
+            
+            // For customers, show sign up tab by default
+            if (role === 'customer') {
+                switchTab('register');
+                document.getElementById('formTabs').style.display = 'flex';
+                document.getElementById('customerRegister').style.display = 'block';
+                document.getElementById('agentAdminInfo').style.display = 'none';
+            } else {
+                // For admin/agent, show login only
+                switchTab('login');
+                document.getElementById('formTabs').style.display = 'flex';
+            }
+        }
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginBtn = document.getElementById('loginTabBtn');
+            const registerBtn = document.getElementById('registerTabBtn');
+            
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                loginBtn.classList.add('active');
+                registerBtn.classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                loginBtn.classList.remove('active');
+                registerBtn.classList.add('active');
+                
+                // Show different content based on role
+                if (selectedRole === 'customer') {
+                    document.getElementById('customerRegister').style.display = 'block';
+                    document.getElementById('agentAdminInfo').style.display = 'none';
+                } else {
+                    document.getElementById('customerRegister').style.display = 'none';
+                    document.getElementById('agentAdminInfo').style.display = 'block';
+                }
+            }
+        }
+
+        function goBack() {
+            document.getElementById('roleSelection').style.display = 'grid';
+            document.getElementById('authForms').style.display = 'none';
+            selectedRole = null;
+            switchTab('login');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const loginError = document.getElementById('loginError');
+
+            loginError.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    loginError.textContent = data.error || 'Login failed';
+                    loginError.style.display = 'block';
+                    return;
+                }
+
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                // Redirect based on role
+                if (data.user.role === 'agent') {
+                    window.location.href = 'dashboard-agent.html';
+                } else if (data.user.role === 'admin') {
+                    window.location.href = 'dashboard-admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                loginError.textContent = 'Network error. Please try again.';
+                loginError.style.display = 'block';
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const regError = document.getElementById('regError');
+
+            regError.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, password, accountType: 'customer' })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    regError.textContent = data.error || 'Registration failed';
+                    regError.style.display = 'block';
+                    return;
+                }
+
+                alert('✅ Account created! Please login.');
+                document.getElementById('loginEmail').value = email;
+                switchTab('login');
+                document.getElementById('registerForm').reset();
+            } catch (error) {
+                regError.textContent = 'Network error. Please try again.';
+                regError.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
