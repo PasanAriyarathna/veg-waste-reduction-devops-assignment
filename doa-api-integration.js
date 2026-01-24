@@ -22,4 +22,71 @@ const DOA_API_CONFIG = {
 // Initialize cache for API responses
 const apiCache = new NodeCache({ stdTTL: 3600 });
 
-module.exports = { DOA_API_CONFIG, apiCache };
+// ============================================================================
+// PART 2: District Production API Endpoint
+// ============================================================================
+
+/**
+ * Fetch district-wise production data from DOA CROPIX
+ * POST /api/doa/district-production
+ * Body: { district, season, year }
+ */
+function setupDistrictProductionEndpoint(app) {
+  app.post('/api/doa/district-production', async (req, res) => {
+    try {
+      const { district, season, year } = req.body;
+      
+      // Validate inputs
+      if (!district || !season || !year) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: district, season, year' 
+        });
+      }
+
+      // Check cache first
+      const cacheKey = `production_${district}_${season}_${year}`;
+      const cachedData = apiCache.get(cacheKey);
+      if (cachedData) {
+        return res.json({ 
+          data: cachedData, 
+          source: 'cache',
+          timestamp: new Date()
+        });
+      }
+
+      // Fetch from DOA CROPIX API
+      const response = await axios.get(`${DOA_API_CONFIG.baseUrl}/production`, {
+        headers: {
+          'Authorization': `Bearer ${DOA_API_CONFIG.authToken}`,
+          'X-API-Key': DOA_API_CONFIG.apiKey,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          district: district,
+          season: season,
+          year: year
+        },
+        timeout: DOA_API_CONFIG.timeout
+      });
+
+      // Cache the result
+      apiCache.set(cacheKey, response.data);
+
+      res.json({
+        data: response.data,
+        source: 'doa_api',
+        timestamp: new Date()
+      });
+
+    } catch (error) {
+      console.error('DOA API Error:', error);
+      res.status(500).json({
+        error: 'Failed to fetch production data',
+        message: error.message,
+        fallback: 'Using cached or demo data'
+      });
+    }
+  });
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint };
