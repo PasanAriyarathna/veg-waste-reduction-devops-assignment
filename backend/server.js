@@ -175,3 +175,45 @@ app.post('/api/auth/login', (req, res) => {
         }
     );
 });
+
+// ===== VEGETABLE CATEGORIES API =====
+
+// 3. GET ALL VEGETABLES
+app.get('/api/vegetables', (req, res) => {
+    db.all(`SELECT * FROM vegetables`, (err, vegetables) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(vegetables);
+    });
+});
+
+// 4. GET SINGLE VEGETABLE
+app.get('/api/vegetables/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.get(
+        `SELECT * FROM vegetables WHERE id = ?`,
+        [id],
+        (err, vegetable) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            if (!vegetable) {
+                return res.status(404).json({ error: 'Vegetable not found' });
+            }
+            res.json(vegetable);
+        }
+    );
+});
+
+// ===== SERVER START =====
+app.listen(PORT, () => {
+    console.log(`
+    =====================================
+    🥬 VEG WASTAGE REDUCTION SYSTEM
+    =====================================
+    ✅ Server running on http://localhost:${PORT}
+    =====================================
+    `);
+});
