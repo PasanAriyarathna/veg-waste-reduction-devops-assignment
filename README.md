@@ -12,6 +12,3 @@
 
 ## Project Description
 The Vegetable Wastage Reduction System is a web application designed to track and reduce vegetable wastage in Sri Lanka. It enables agricultural agents to monitor harvest data across all 22 districts in real-time, identify production trends, and make data-driven decisions to minimize wastage.
-
-## Live Deployment
-🔗 **Live URL:** pending
