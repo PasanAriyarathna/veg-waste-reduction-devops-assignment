@@ -132,4 +132,78 @@ function isValidPassword(password) {
     return trimmed.length >= 6 && trimmed.length <= 128;
 }
 
+// ===== AUTHENTICATION APIs =====
+
+// 1. REGISTER API - Customers only
+app.post('/api/auth/register', (req, res) => {
+    const { email, password, name, phone, accountType } = req.body;
+
+    if (!email || !password || !name || !phone || !accountType) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (accountType !== 'customer') {
+        return res.status(403).json({ error: 'Agent accounts can only be created by Admin' });
+    }
+
+    db.run(
+        `INSERT INTO users (email, password, name, phone, role, district) VALUES (?, ?, ?, ?, 'customer', NULL)`,
+        [email, password, name, phone],
+        function(err) {
+            if (err) {
+                if (String(err.message).toLowerCase().includes('unique')) {
+                    return res.status(400).json({ error: 'Email already exists' });
+                }
+                return res.status(500).json({ error: 'Registration failed' });
+            }
+            res.json({
+                success: true,
+                message: 'Customer account created successfully',
+                userId: this.lastID
+            });
+        }
+    );
+});
+
+// 2. LOGIN API
+app.post('/api/auth/login', (req, res) => {
+    const email = (req.body.email || '').trim();
+    const password = (req.body.password || '').trim();
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password required' });
+    }
+    if (!isValidEmail(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+    }
+    if (!isValidPassword(password)) {
+        return res.status(400).json({ error: 'Password must be 6+ characters' });
+    }
+
+    db.get(
+        `SELECT * FROM users WHERE email = ? AND password = ?`,
+        [email, password],
+        (err, user) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+
+            if (!user) {
+                return res.status(401).json({ error: 'Invalid credentials' });
+            }
+
+            res.json({
+                success: true,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                    district: user.district
+                }
+            });
+        }
+    );
+});
+
 module.exports = { app, PORT, db, isValidEmail, isValidPassword };
