@@ -50,9 +50,13 @@ jobs:
       timeout-minutes: 15
 
     - name: Deployment status
+      shell: bash
       if: success()
       run: echo "✅ Deployment Successful"
+      timeout-minutes: 1
 
     - name: Deployment failed
+      shell: bash
       if: failure()
       run: echo "❌ Deployment Failed"
+      timeout-minutes: 1

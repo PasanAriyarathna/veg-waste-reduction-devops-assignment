@@ -63,9 +63,13 @@ jobs:
       timeout-minutes: 5
 
     - name: Build status
+      shell: bash
       if: success()
       run: echo "✅ CI Pipeline Passed"
+      timeout-minutes: 1
 
     - name: Build failed
+      shell: bash
       if: failure()
       run: echo "❌ CI Pipeline Failed"
+      timeout-minutes: 1
