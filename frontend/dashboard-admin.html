@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - VegWaste</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #1b7a3d 0%, #27a047 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .stat-number {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .stat-label {
+      font-size: 0.95em;
+      opacity: 0.9;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .table th {
+      background: #1b7a3d;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .table td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .table tr:hover {
+      background: #f5f5f5;
+    }
+    .btn-delete {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85em;
+    }
+    .btn-delete:hover {
+      background: #c0392b;
+    }
+    .credentials-box {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .credentials-box h3 {
+      margin-top: 0;
+      color: #856404;
+    }
+    .credential-item {
+      background: white;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <span class="emoji">🥬</span>
+        <span class="text">VegWaste Sri Lanka</span>
+      </div>
+      <div class="nav-menu">
+        <a href="dashboard-admin.html" class="nav-link active">Admin</a>
+        <a href="category.html" class="nav-link">Vegetables</a>
+        <a href="district-tracking.html" class="nav-link">Districts</a>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="dashboard-card">
+      <h1>🛠️ Admin Dashboard</h1>
+      <p id="adminGreeting"></p>
+
+      <!-- Demo Credentials -->
+      <div class="credentials-box">
+        <h3>📋 Demo Login Credentials</h3>
+        <div class="credential-item">
+          <strong>Admin:</strong> admin@vegwaste.lk / admin123
+        </div>
+        <div class="credential-item">
+          <strong>Agent (Colombo):</strong> agent.colombo@vegwaste.lk / agent123
+        </div>
+        <div class="credential-item">
+          <strong>Agent (Kandy):</strong> agent.kandy@vegwaste.lk / agent123
+        </div>
+        <div class="credential-item">
+          <strong>Agent (Galle):</strong> agent.galle@vegwaste.lk / agent123
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="totalAgents">0</div>
+          <div class="stat-label">Total Agents</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="availableSlots">25</div>
+          <div class="stat-label">Available Slots</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">25</div>
+          <div class="stat-label">Total Districts</div>
+        </div>
+      </div>
+
+      <div class="dashboard-section">
+        <h2>➕ Create New Agent</h2>
+        <form id="createAgentForm">
+          <div class="form-group">
+            <label for="agentName">Full Name</label>
+            <input type="text" id="agentName" placeholder="e.g., Nimal Perera" required>
+          </div>
+          <div class="form-group">
+            <label for="agentEmail">Email</label>
+            <input type="email" id="agentEmail" placeholder="e.g., agent.matara@vegwaste.lk" required>
+          </div>
+          <div class="form-group">
+            <label for="agentPhone">Phone</label>
+            <input type="tel" id="agentPhone" placeholder="e.g., 0771234567" required>
+          </div>
+          <div class="form-group">
+            <label for="agentPassword">Password</label>
+            <input type="password" id="agentPassword" placeholder="Minimum 6 characters" required>
+          </div>
+          <div class="form-group">
+            <label for="agentDistrict">Assign District (one agent per district)</label>
+            <select id="agentDistrict" required></select>
+          </div>
+          <div id="agentFormMsg" class="form-error" style="display:none"></div>
+          <button type="submit" class="btn btn-primary">Create Agent Account</button>
+        </form>
+      </div>
+
+      <div class="dashboard-section">
+        <h2>👥 Manage Agents (<span id="agentCount">0</span>/25)</h2>
+        <table class="table" id="agentsTable">
+          <thead>
+            <tr>
+              <th>District</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Agent ID</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="noAgents" style="display:none; text-align:center; padding:40px; color:#999;">
+          No agents created yet. Create your first agent above.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function logout(){ if(confirm('Logout?')){ localStorage.removeItem('user'); location.href='index.html'; } }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || user.role !== 'admin') {
+      alert('Admin access only');
+      location.href = 'signin.html';
+    }
+
+    document.getElementById('adminGreeting').innerHTML = `Welcome, <strong>${user.name}</strong> 🛠️ (Administrator)`;
+
+    async function loadDistricts(){
+      try {
+        const res = await fetch('/api/districts');
+        const districts = await res.json();
+        const sel = document.getElementById('agentDistrict');
+        sel.innerHTML = '<option value="">-- Select District --</option>';
+        
+        // Get existing agent districts
+        const agentsRes = await fetch(`/api/admin/agents?requesterId=${user.id}`);
+        const agents = await agentsRes.json();
+        const assignedDistricts = agents.map(a => a.district);
+        
+        districts.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = assignedDistricts.includes(d) ? `${d} (Already assigned)` : d;
+          opt.disabled = assignedDistricts.includes(d);
+          sel.appendChild(opt);
+        });
+      } catch(e) {
+        console.error('Error loading districts:', e);
+      }
+    }
+
+    async function loadAgents(){
+      try {
+        const res = await fetch(`/api/admin/agents?requesterId=${user.id}`);
+        const agents = await res.json();
+        const tbody = document.querySelector('#agentsTable tbody');
+        tbody.innerHTML = '';
+        
+        document.getElementById('totalAgents').textContent = agents.length;
+        document.getElementById('availableSlots').textContent = 25 - agents.length;
+        document.getElementById('agentCount').textContent = agents.length;
+        
+        if (agents.length === 0) {
+          document.getElementById('noAgents').style.display = 'block';
+          document.getElementById('agentsTable').style.display = 'none';
+        } else {
+          document.getElementById('noAgents').style.display = 'none';
+          document.getElementById('agentsTable').style.display = 'table';
+          
+          agents.forEach(a => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><strong>${a.district}</strong></td>
+              <td>${a.name}</td>
+              <td>${a.email}</td>
+              <td>${a.phone}</td>
+              <td>#${a.id}</td>
+              <td>
+                <button class="btn-delete" onclick="deleteAgent(${a.id}, '${a.name}')">
+                  🗑️ Delete
+                </button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch(e) {
+        console.error('Error loading agents:', e);
+      }
+    }
+
+    async function deleteAgent(agentId, agentName) {
+      if (!confirm(`Are you sure you want to delete agent "${agentName}"?\n\nThis will permanently remove their account.`)) {
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/api/admin/agents/${agentId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requesterId: user.id })
+        });
+        
+        const data = await res.json();
+        if (!res.ok) {
+          alert('❌ ' + (data.error || 'Failed to delete agent'));
+          return;
+        }
+        
+        alert('✅ Agent deleted successfully');
+        await loadAgents();
+        await loadDistricts(); // Refresh districts dropdown
+      } catch(e) {
+        console.error('Error deleting agent:', e);
+        alert('❌ Network error');
+      }
+    }
+
+    document.getElementById('createAgentForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const name = document.getElementById('agentName').value.trim();
+      const email = document.getElementById('agentEmail').value.trim();
+      const phone = document.getElementById('agentPhone').value.trim();
+      const password = document.getElementById('agentPassword').value;
+      const district = document.getElementById('agentDistrict').value;
+      const msg = document.getElementById('agentFormMsg');
+      msg.style.display = 'none';
+
+      if (!district) {
+        msg.textContent = '❌ Please select a district';
+        msg.className = 'form-error show';
+        msg.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/create-agent',{
+          method:'POST', 
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ requesterId: user.id, name, email, phone, password, district })
+        });
+        const data = await res.json();
+        
+        if(!res.ok){ 
+          msg.textContent = '❌ ' + (data.error||'Failed to create agent'); 
+          msg.className='form-error show'; 
+          msg.style.display='block'; 
+          return; 
+        }
+        
+        alert(`✅ Agent created successfully!\n\nLogin credentials:\nEmail: ${email}\nPassword: ${password}\n\nAgent can now login and manage ${district} district.`);
+        e.target.reset();
+        await loadAgents();
+        await loadDistricts();
+      } catch(e) {
+        console.error('Error creating agent:', e);
+        msg.textContent = '❌ Network error';
+        msg.className = 'form-error show';
+        msg.style.display = 'block';
+      }
+    });
+
+    (async ()=>{ 
+      await loadDistricts(); 
+      await loadAgents(); 
+    })();
+  </script>
+</body>
+</html>
