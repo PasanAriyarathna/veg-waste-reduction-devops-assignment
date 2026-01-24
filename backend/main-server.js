@@ -16,6 +16,25 @@ const db = new sqlite3.Database('./veg_waste.db', (err) => {
     else console.log('✅ Connected to SQLite Database');
 });
 
+// Create tables
+db.serialize(() => {
+    // Users table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            name TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            role TEXT NOT NULL,
+            district TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    console.log('✅ Users table initialized');
+});
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
