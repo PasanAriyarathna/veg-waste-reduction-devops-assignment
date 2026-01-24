@@ -1,0 +1,26 @@
+{
+  "name": "veg-waste-reduction",
+  "version": "1.0.0",
+  "description": "Vegetable Wastage Reduction System for Sri Lanka",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "strip-comments": "node scripts/strip-comments.js"
+  },
+  "keywords": ["agriculture", "wastage", "vegetables"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "postcss": "^8.5.1",
+    "postcss-discard-comments": "^7.0.3",
+    "postcss-safe-parser": "^7.0.1",
+    "terser": "^5.39.0"
+  }
+}
