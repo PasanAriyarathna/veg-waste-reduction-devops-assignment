@@ -47,6 +47,7 @@ jobs:
       timeout-minutes: 10
     
     - name: Verify project structure
+      shell: bash
       run: |
         echo "Verifying project structure..."
         echo "✅ Root dependencies installed"

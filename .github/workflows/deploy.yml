@@ -32,6 +32,7 @@ jobs:
       timeout-minutes: 10
     
     - name: Verify dependencies
+      shell: bash
       run: |
         echo "Verifying dependencies..."
         npm list --depth=0 || true
