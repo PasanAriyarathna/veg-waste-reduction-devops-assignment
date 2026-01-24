@@ -302,6 +302,16 @@ app.delete('/api/harvest/:id', (req, res) => {
     });
 });
 
+// 9. GET ALL DISTRICTS (for dropdown)
+app.get('/api/districts', (req, res) => {
+    const districts = [
+        'Colombo', 'Galle', 'Matara', 'Hambantota', 'Kalutara', 'Rathnapura', 'Kegalle',
+        'Kandy', 'Matale', 'Nuwara Eliya', 'Badulla', 'Monaragala', 'Ampara', 'Batticaloa',
+        'Trincomalee', 'Mullaitivu', 'Vavuniya', 'Anuradhapura', 'Polonnaruwa', 'Kurunegala', 'Puttalam', 'Jaffna'
+    ];
+    res.json(districts);
+});
+
 // ===== SERVER START =====
 app.listen(PORT, () => {
     console.log(`
@@ -309,6 +319,8 @@ app.listen(PORT, () => {
     🥬 VEG WASTAGE REDUCTION SYSTEM
     =====================================
     ✅ Server running on http://localhost:${PORT}
+    ✅ Database: veg_waste.db
+    ✅ Ready to reduce wastage in Sri Lanka!
     =====================================
     `);
 });
