@@ -390,3 +390,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('beforeunload', () => {
         clearInterval(refreshInterval);
     });
+});
