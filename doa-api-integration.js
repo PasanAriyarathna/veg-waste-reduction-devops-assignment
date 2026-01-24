@@ -209,4 +209,64 @@ function setupDistrictsEndpoint(app) {
   });
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint };
+/**
+ * Sync DOA data to local database
+ * POST /api/admin/sync-doa-data
+ * Requires: admin authentication
+ */
+function setupAdminSyncEndpoint(app, db) {
+  app.post('/api/admin/sync-doa-data', async (req, res) => {
+    try {
+      // Verify admin token (implement your auth logic)
+      if (!req.headers.authorization) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Fetch all production data
+      const response = await axios.get(
+        `${DOA_API_CONFIG.baseUrl}/production/all`,
+        {
+          headers: {
+            'Authorization': `Bearer ${DOA_API_CONFIG.authToken}`,
+            'X-API-Key': DOA_API_CONFIG.apiKey
+          },
+          timeout: DOA_API_CONFIG.timeout
+        }
+      );
+
+      // Store in local database
+      const { data } = response;
+      
+      for (const record of data) {
+        db.run(
+          `INSERT OR REPLACE INTO production_data 
+           (district, crop, season, year, month, production_mt, timestamp)
+           VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          [
+            record.district,
+            record.crop,
+            record.season,
+            record.year,
+            record.month,
+            record.production_mt
+          ]
+        );
+      }
+
+      res.json({
+        message: 'Data sync completed',
+        recordsProcessed: data.length,
+        timestamp: new Date()
+      });
+
+    } catch (error) {
+      console.error('Data sync error:', error);
+      res.status(500).json({ 
+        error: 'Failed to sync DOA data',
+        message: error.message 
+      });
+    }
+  });
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint, setupAdminSyncEndpoint };
