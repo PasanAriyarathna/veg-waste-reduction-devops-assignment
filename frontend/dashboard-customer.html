@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard - VegWaste</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .welcome-card {
+      background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .welcome-card h2 {
+      color: white;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <span class="emoji">🥬</span>
+        <span class="text">VegWaste Sri Lanka</span>
+      </div>
+      <div class="nav-menu">
+        <a href="dashboard-customer.html" class="nav-link active">Dashboard</a>
+        <a href="category.html" class="nav-link">View Vegetables</a>
+        <a href="district-tracking.html" class="nav-link">Districts</a>
+        <a href="seasonal-tracking.html" class="nav-link">Seasons</a>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="dashboard-card">
+      <div class="welcome-card">
+        <h2>👥 Welcome, <span id="custName"></span>!</h2>
+        <p>You are viewing harvest data in read-only mode.</p>
+      </div>
+
+      <div class="dashboard-section">
+        <h2>📊 Available Actions</h2>
+        <div class="action-grid">
+          <div class="action-card">
+            <div class="action-icon">🥕</div>
+            <h3>View Vegetables</h3>
+            <p>Browse all available vegetables and their harvest data</p>
+            <a href="category.html" class="btn btn-primary">View Categories</a>
+          </div>
+
+          <div class="action-card">
+            <div class="action-icon">📈</div>
+            <h3>View Charts & Statistics</h3>
+            <p>See detailed charts for harvest data across districts</p>
+            <a href="category.html" class="btn btn-primary">View Charts</a>
+          </div>
+
+          <div class="action-card">
+            <div class="action-icon">📍</div>
+            <h3>District Tracking</h3>
+            <p>Monitor harvest data collected across all 25 districts</p>
+            <a href="district-tracking.html" class="btn btn-primary">View Map</a>
+          </div>
+
+          <div class="action-card">
+            <div class="action-icon">🌾</div>
+            <h3>Seasonal Guide</h3>
+            <p>Learn about vegetable planting and harvest seasons</p>
+            <a href="seasonal-tracking.html" class="btn btn-primary">View Seasons</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-section info-box">
+        <h3>ℹ️ Customer Features</h3>
+        <ul>
+          <li>✅ View harvest data from all districts</li>
+          <li>✅ View charts and statistics</li>
+          <li>✅ Track vegetable availability and seasonal info</li>
+          <li>✅ Browse all vegetables</li>
+          <li>❌ Cannot add or edit data (agents only)</li>
+          <li>❌ Cannot manage agents (admin only)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function logout(){ 
+      if(confirm('Are you sure you want to logout?')){ 
+        localStorage.removeItem('user'); 
+        location.href='index.html'; 
+      } 
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || user.role !== 'customer') {
+      alert('Customer access only');
+      location.href = 'signin.html';
+    }
+
+    document.getElementById('custName').textContent = user.name;
+  </script>
+</body>
+</html>
