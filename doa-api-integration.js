@@ -3,6 +3,9 @@
  * VegWaste Sri Lanka - Agricultural Data Integration
  */
 
+const axios = require('axios');
+const NodeCache = require('node-cache');
+
 // ============================================================================
 // PART 1: Environment Setup & Configuration
 // ============================================================================
@@ -16,4 +19,7 @@ const DOA_API_CONFIG = {
   cacheDuration: 3600 // 1 hour
 };
 
-module.exports = { DOA_API_CONFIG };
+// Initialize cache for API responses
+const apiCache = new NodeCache({ stdTTL: 3600 });
+
+module.exports = { DOA_API_CONFIG, apiCache };
