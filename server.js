@@ -81,6 +81,18 @@ db.serialize(() => {
     console.log('✅ Users table initialized');
 });
 
+// Seed default admin if none exists
+db.get(`SELECT id FROM users WHERE role = 'admin' LIMIT 1`, (err, row) => {
+    if (!row) {
+        db.run(`INSERT OR IGNORE INTO users (email, password, name, phone, role, district) VALUES (?, ?, ?, ?, 'admin', NULL)`,
+            ['admin@vegwaste.lk', 'admin123', 'Admin User', '0771234567'],
+            (e) => {
+                if (!e) console.log('✅ Seeded default admin: admin@vegwaste.lk / admin123');
+            }
+        );
+    }
+});
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
