@@ -13,13 +13,11 @@ const PORT = process.env.PORT || 3000; // Render provides PORT
 const PUBLIC_DIR = path.join(__dirname, '../frontend');
 const BASE_DB_PATH = path.join(__dirname, '../veg_waste.db');
 const TMP_DB_PATH = path.join('/tmp', 'veg_waste.db');
-const IS_VERCEL = !!process.env.VERCEL;
 const IS_RENDER = !!process.env.RENDER; // Render sets RENDER=true
-const USE_TMP_DB = IS_VERCEL || IS_RENDER;
 
-// On serverless or render, copy SQLite DB to /tmp (writeable) to avoid read-only errors
+// On Render, copy SQLite DB to /tmp (writeable) to avoid read-only errors
 const DB_PATH = (() => {
-    if (USE_TMP_DB) {
+    if (IS_RENDER) {
         try {
             if (!fs.existsSync(TMP_DB_PATH)) {
                 fs.copyFileSync(BASE_DB_PATH, TMP_DB_PATH);
@@ -384,12 +382,12 @@ if (require.main === module) {
         🥬 VEG WASTAGE REDUCTION SYSTEM
         =====================================
         ✅ Server running on http://localhost:${PORT}
-        ✅ Database: ${IS_VERCEL ? TMP_DB_PATH : BASE_DB_PATH}
+        ✅ Database: ${IS_RENDER ? TMP_DB_PATH : BASE_DB_PATH}
         ✅ Ready to reduce wastage in Sri Lanka!
         =====================================
         `);
     });
 }
 
-// Export app for serverless environments (e.g., Vercel)
+// Export app for Render environments
 module.exports = app;
