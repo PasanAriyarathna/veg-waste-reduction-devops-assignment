@@ -42,6 +42,23 @@ db.serialize(() => {
         )
     `);
 
+    // Harvest data table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS harvest_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vegetable_id INTEGER NOT NULL,
+            district TEXT NOT NULL,
+            quantity REAL NOT NULL,
+            unit TEXT DEFAULT 'kg',
+            harvest_date DATE NOT NULL,
+            employee_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (vegetable_id) REFERENCES vegetables(id),
+            FOREIGN KEY (employee_id) REFERENCES users(id)
+        )
+    `);
+
     console.log('✅ Users table initialized');
 });
 
