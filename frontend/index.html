@@ -131,5 +131,39 @@
     </footer>
 
     <script src="app.js"></script>
+    <script>
+        function searchByDistrict() {
+            const district = document.getElementById('searchDistrict').value;
+            if (district.trim()) {
+                window.location.href = `district-tracking.html?district=${encodeURIComponent(district)}`;
+            } else {
+                alert('Please enter a district name');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Update navbar based on login status
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const signInBtn = document.querySelector('.btn-signup');
+            
+            if (user) {
+                // User is logged in - show logout button
+                signInBtn.textContent = 'Logout';
+                signInBtn.onclick = logout;
+            } else {
+                // Not logged in - show sign in button
+                signInBtn.textContent = 'Sign In';
+                signInBtn.onclick = () => window.location.href = 'signin.html';
+            }
+        });
+    </script>
 </body>
 </html>
