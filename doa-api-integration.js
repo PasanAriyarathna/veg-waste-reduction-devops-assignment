@@ -269,4 +269,46 @@ function setupAdminSyncEndpoint(app, db) {
   });
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint, setupAdminSyncEndpoint };
+// ============================================================================
+// PART 3: Error Handling & Fallback Strategy
+// ============================================================================
+
+/**
+ * Robust API caller with retry logic
+ */
+async function fetchFromDOAWithRetry(endpoint, params, maxRetries = 3) {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await axios.get(
+        `${DOA_API_CONFIG.baseUrl}${endpoint}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${DOA_API_CONFIG.authToken}`,
+            'X-API-Key': DOA_API_CONFIG.apiKey
+          },
+          params,
+          timeout: DOA_API_CONFIG.timeout
+        }
+      );
+
+      console.log(`✓ DOA API success on attempt ${attempt}`);
+      return response.data;
+
+    } catch (error) {
+      lastError = error;
+      console.warn(`✗ Attempt ${attempt} failed:`, error.message);
+      
+      if (attempt < maxRetries) {
+        // Exponential backoff
+        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt - 1)));
+      }
+    }
+  }
+
+  console.error('All retry attempts failed:', lastError);
+  throw lastError;
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint, setupAdminSyncEndpoint, fetchFromDOAWithRetry };
