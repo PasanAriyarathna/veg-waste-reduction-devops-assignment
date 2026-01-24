@@ -9,15 +9,17 @@ const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Render provides PORT
 const PUBLIC_DIR = path.join(__dirname, '../frontend');
 const BASE_DB_PATH = path.join(__dirname, '../veg_waste.db');
 const TMP_DB_PATH = path.join('/tmp', 'veg_waste.db');
 const IS_VERCEL = !!process.env.VERCEL;
+const IS_RENDER = !!process.env.RENDER; // Render sets RENDER=true
+const USE_TMP_DB = IS_VERCEL || IS_RENDER;
 
-// On Vercel, copy SQLite DB to /tmp (writeable) to avoid read-only errors
+// On serverless or render, copy SQLite DB to /tmp (writeable) to avoid read-only errors
 const DB_PATH = (() => {
-    if (IS_VERCEL) {
+    if (USE_TMP_DB) {
         try {
             if (!fs.existsSync(TMP_DB_PATH)) {
                 fs.copyFileSync(BASE_DB_PATH, TMP_DB_PATH);
