@@ -52,3 +52,32 @@ We implemented a professional Git workflow:
 - Merge conflict resolution and release coordination
 - Commits: ci (initial), deploy (initial), chore (dependencies), docs (badges)
 
+### Nethmina Seeman — Frontend Developer
+- Complete responsive UI/UX design and implementation
+- HTML pages: `frontend/index.html`, `frontend/signin.html`, `frontend/category.html`, `frontend/dashboard-admin.html`, `frontend/dashboard-agent.html`, `frontend/dashboard-customer.html`, `frontend/District-tracking.html`, `frontend/seasonal-guide.html`,
+`frontend/seasonal-tracking.html`
+- CSS styling with mobile responsiveness: `frontend/styles.css`
+- JavaScript authentication logic: `frontend/auth.js`
+- Core application functions: `frontend/app.js`
+- Add to API overview: `frontend/vegetable-details.js`
+- README creation and maintenance
+- User documentation and setup instructions
+- Code review participation
+- Commits: feat (homepage), feat (login), docs (readme), style (responsive design)
+
+### Hiranya Pahasara — Backend Developer
+- Express.js server setup with RESTful API design
+- SQLite database schema and configuration
+- API endpoints implementation in `backend/server.js`
+	- GET `/api/vegetables` — Fetch all vegetables
+	- GET `/api/vegetables/:id` — Fetch single vegetable
+	- GET `/api/harvest/:vegetableId` — District totals by date
+	- POST `/api/harvest` — Add harvest data (employee only)
+	- PUT `/api/harvest/:id` — Update harvest data (employee only)
+	- DELETE `/api/harvest/:id` — Delete harvest data (employee only)
+	- Auth: POST `/api/auth/register`, POST `/api/auth/login`
+- Database seeding script: `backend/seed-data.js`
+- Backend testing and validation
+- API documentation
+- Commits: feat (server), feat (endpoints), test (seed-data)
+
