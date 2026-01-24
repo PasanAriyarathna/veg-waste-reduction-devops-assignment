@@ -81,3 +81,44 @@ We implemented a professional Git workflow:
 - API documentation
 - Commits: feat (server), feat (endpoints), test (seed-data)
 
+## Setup Instructions
+
+### Prerequisites
+- Node.js v18 or v20
+- Git
+- npm (bundled with Node.js)
+
+### Installation
+```bash
+# Clone repository
+git clone https://github.com/PasanAriyarathna/veg-waste-reduction-devops-assignment.git
+cd veg-waste-reduction-devops-assignment
+
+# Install dependencies
+npm install
+
+# Seed database (optional)
+node backend/seed-data.js
+
+# Start server (serves frontend and APIs)
+npm start
+
+# Open the app
+# http://localhost:3000
+```
+### Default Credentials (seeded)
+- Admin — email: `admin@mail.com`, password: `admin123`
+- Employee (Colombo) — email: `farmer@colombo.com`, password: `farm123`
+- Employee (Galle) — email: `farmer@galle.com`, password: `farm123`
+- Customer — email: `customer@mail.com`, password: `cust123`
+
+## API Overview
+- `GET /api/vegetables` — List categories
+- `GET /api/vegetables/:id` — Category details
+- `GET /api/harvest/:vegetableId` — Aggregated quantities per district/date
+- `POST /api/harvest` — Add harvest (requires `employeeRole: "employee"`)
+- `PUT /api/harvest/:id` — Update harvest (employee only)
+- `DELETE /api/harvest/:id` — Delete harvest (employee only)
+- `POST /api/auth/register` — Customer or employee (auto by district)
+- `POST /api/auth/login` — Login and receive role/district
+
