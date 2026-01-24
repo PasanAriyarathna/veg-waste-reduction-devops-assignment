@@ -345,4 +345,46 @@ app.get('/api/vegetables/:id', (req, res) => {
     );
 });
 
+// ===== HARVEST DATA APIs =====
+
+// Get user's recent harvest updates
+app.get('/api/harvest', (req, res) => {
+    const { userId, vegetableId, limit = 10 } = req.query;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+    }
+
+    let query = `SELECT 
+                    h.id,
+                    h.vegetable_id,
+                    v.name as vegetable_name,
+                    v.emoji,
+                    h.district,
+                    h.quantity,
+                    h.harvest_date,
+                    h.created_at,
+                    h.employee_id
+                 FROM harvest_data h
+                 JOIN vegetables v ON h.vegetable_id = v.id
+                 WHERE h.employee_id = ?`;
+    let params = [userId];
+
+    if (vegetableId) {
+        query += ` AND h.vegetable_id = ?`;
+        params.push(vegetableId);
+    }
+
+    query += ` ORDER BY h.created_at DESC LIMIT ?`;
+    params.push(parseInt(limit));
+
+    db.all(query, params, (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(data || []);
+    });
+});
+
 module.exports = { app, PORT, db, isValidEmail, isValidPassword };
