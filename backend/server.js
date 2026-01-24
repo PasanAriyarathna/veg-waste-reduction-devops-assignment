@@ -88,13 +88,90 @@ db.serialize(() => {
     console.log('✅ Database tables initialized');
 });
 
-// ===== SERVER START =====
-app.listen(PORT, () => {
-    console.log(`
-    =====================================
-    🥬 VEG WASTAGE REDUCTION SYSTEM
-    =====================================
-    ✅ Server running on http://localhost:${PORT}
-    =====================================
-    `);
+// ===== SIMPLE INPUT VALIDATION HELPERS =====
+function isValidEmail(email) {
+    if (typeof email !== 'string') return false;
+    const trimmed = email.trim();
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(trimmed) && trimmed.length <= 254;
+}
+
+function isValidPassword(password) {
+    if (typeof password !== 'string') return false;
+    const trimmed = password.trim();
+    return trimmed.length >= 6 && trimmed.length <= 128;
+}
+
+// ===== AUTHENTICATION APIS =====
+
+// 1. REGISTER API
+app.post('/api/auth/register', (req, res) => {
+    const { email, password, name, phone, district } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !name || !phone) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Auto-detect role based on district and phone patterns
+    // If district is provided, they're likely an employee
+    const role = district ? 'employee' : 'customer';
+
+    db.run(
+        `INSERT INTO users (email, password, name, phone, role, district) VALUES (?, ?, ?, ?, ?, ?)`,
+        [email, password, name, phone, role, district || null],
+        function(err) {
+            if (err) {
+                return res.status(400).json({ error: 'Email already exists' });
+            }
+            res.json({
+                success: true,
+                message: 'Registration successful',
+                userId: this.lastID,
+                role: role
+            });
+        }
+    );
+});
+
+// 2. LOGIN API
+app.post('/api/auth/login', (req, res) => {
+    const email = (req.body.email || '').trim();
+    const password = (req.body.password || '').trim();
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password required' });
+    }
+    if (!isValidEmail(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+    }
+    if (!isValidPassword(password)) {
+        return res.status(400).json({ error: 'Password must be 6+ characters' });
+    }
+
+    db.get(
+        `SELECT * FROM users WHERE email = ? AND password = ?`,
+        [email, password],
+        (err, user) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+
+            if (!user) {
+                return res.status(401).json({ error: 'Invalid credentials' });
+            }
+
+            // Return user with role (automatic role detection)
+            res.json({
+                success: true,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                    district: user.district
+                }
+            });
+        }
+    );
 });
