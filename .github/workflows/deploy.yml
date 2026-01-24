@@ -60,12 +60,11 @@ jobs:
     if: always()
     steps:
     - name: Deploy notification
+      shell: bash
       run: |
-        DEPLOY_RESULT="${{ needs.deploy.result }}"
-        if [ "$DEPLOY_RESULT" == "success" ]; then
+        DEPLOY_RESULT=${{ needs.deploy.result }}
+        if [ "$DEPLOY_RESULT" = "success" ]; then
           echo "✅ Deployment successful"
-          exit 0
         else
           echo "❌ Deployment failed (result: $DEPLOY_RESULT)"
-          exit 0
         fi
