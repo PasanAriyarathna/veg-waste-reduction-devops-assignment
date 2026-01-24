@@ -39,3 +39,16 @@ We implemented a professional Git workflow:
 	- `feature/devops-pipeline` — CI/CD pipeline setup
 - `docs/readme` — Edit readme file
 
+## Individual Contributions
+
+### Pasan Ariyarathna — DevOps/Release Manager
+- Repository initialization and GitHub configuration
+- GitHub Actions CI/CD pipeline setup
+	- `.github/workflows/ci.yml` — Node.js matrix testing (18.x, 20.x), install hardening, audit
+	- `.github/workflows/deploy.yml` — Vercel auto-deployment with secrets checks
+	- Security audit with high severity threshold
+- Branch protection rules on `main` and `develop`
+- Deployment platform setup (Render configuration)
+- Merge conflict resolution and release coordination
+- Commits: ci (initial), deploy (initial), chore (dependencies), docs (badges)
+
