@@ -32,6 +32,7 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
+      shell: bash
       run: npm install --legacy-peer-deps --no-audit
       continue-on-error: true
       timeout-minutes: 10
@@ -75,6 +76,7 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
+      shell: bash
       run: npm install --legacy-peer-deps --no-audit
       continue-on-error: true
       timeout-minutes: 10
