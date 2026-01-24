@@ -93,6 +93,26 @@ db.get(`SELECT id FROM users WHERE role = 'admin' LIMIT 1`, (err, row) => {
     }
 });
 
+// Seed sample agents if none exist
+db.get(`SELECT COUNT(*) as count FROM users WHERE role = 'agent'`, (err, row) => {
+    if (!err && row.count === 0) {
+        const sampleAgents = [
+            ['agent.colombo@vegwaste.lk', 'agent123', 'Nimal Perera', '0771111111', 'Colombo'],
+            ['agent.kandy@vegwaste.lk', 'agent123', 'Saman Silva', '0772222222', 'Kandy'],
+            ['agent.galle@vegwaste.lk', 'agent123', 'Kumari Fernando', '0773333333', 'Galle']
+        ];
+        
+        sampleAgents.forEach(agent => {
+            db.run(`INSERT OR IGNORE INTO users (email, password, name, phone, role, district) VALUES (?, ?, ?, ?, 'agent', ?)`,
+                agent,
+                (e) => {
+                    if (!e) console.log(`✅ Seeded sample agent: ${agent[0]} / agent123`);
+                }
+            );
+        });
+    }
+});
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
