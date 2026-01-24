@@ -32,6 +32,16 @@ db.serialize(() => {
         )
     `);
 
+    // Vegetables table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS vegetables (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            emoji TEXT,
+            description TEXT
+        )
+    `);
+
     console.log('✅ Users table initialized');
 });
 
