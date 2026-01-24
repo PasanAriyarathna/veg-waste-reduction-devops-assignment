@@ -18,6 +18,7 @@ The Vegetable Wastage Reduction System is a web application designed to track an
 - **DevOps:** GitHub Actions (CI/CD)
 - **Deployment:** Render
 - **Version Control:** Git, GitHub
+- **Communication:** Discord(https://discord.gg/JyDUZQSW)
 
 ## Features
 - 🔐 User authentication (Admin, Employee, Customer roles)
