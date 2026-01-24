@@ -311,4 +311,81 @@ async function fetchFromDOAWithRetry(endpoint, params, maxRetries = 3) {
   throw lastError;
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint, setupAdminSyncEndpoint, fetchFromDOAWithRetry };
+// ============================================================================
+// PART 4: Database Schema for Storing DOA Data
+// ============================================================================
+
+/**
+ * Initialize DOA data tables
+ */
+function initializeDOADatabase(db) {
+  // Production data table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS production_data (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      district TEXT NOT NULL,
+      crop TEXT NOT NULL,
+      season TEXT CHECK(season IN ('Maha', 'Yala', 'Inter-season')),
+      year INTEGER NOT NULL,
+      month INTEGER,
+      production_mt REAL,
+      target_mt REAL,
+      actual_vs_target_percent REAL,
+      data_source TEXT DEFAULT 'doa_cropix',
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(district, crop, season, year, month)
+    )
+  `);
+
+  // Agro-climatic zones table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS agro_climatic_zones (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      district TEXT NOT NULL UNIQUE,
+      zone TEXT CHECK(zone IN ('Up-Country', 'Mid-Country', 'Low-Country')),
+      rainfall_zone TEXT CHECK(rainfall_zone IN ('Wet', 'Intermediate', 'Dry')),
+      elevation_range TEXT,
+      primary_vegetables TEXT,
+      irrigation_available BOOLEAN,
+      latitude REAL,
+      longitude REAL
+    )
+  `);
+
+  // Seasonal targets table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS seasonal_targets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      district TEXT NOT NULL,
+      crop TEXT NOT NULL,
+      season TEXT NOT NULL,
+      year INTEGER NOT NULL,
+      target_production_mt REAL,
+      achievability_percent REAL,
+      notes TEXT,
+      updated_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(district, crop, season, year)
+    )
+  `);
+
+  console.log('✅ DOA database tables initialized');
+}
+
+// ============================================================================
+// PART 5: Monitoring & Logging
+// ============================================================================
+
+const fs = require('fs');
+
+function setupDOALogging(logFile = 'doa_api.log') {
+  const log = (message, level = 'INFO') => {
+    const timestamp = new Date().toISOString();
+    const logEntry = `[${timestamp}] ${level}: ${message}\n`;
+    fs.appendFileSync(logFile, logEntry);
+    console.log(logEntry);
+  };
+
+  return log;
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint, setupAdminSyncEndpoint, fetchFromDOAWithRetry, initializeDOADatabase, setupDOALogging };
