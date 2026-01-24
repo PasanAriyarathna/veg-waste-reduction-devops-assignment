@@ -388,4 +388,70 @@ function setupDOALogging(logFile = 'doa_api.log') {
   return log;
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint, setupAdminSyncEndpoint, fetchFromDOAWithRetry, initializeDOADatabase, setupDOALogging };
+// ============================================================================
+// PART 6: Data Synchronization Strategy with Scheduled Jobs
+// ============================================================================
+
+/**
+ * Setup automated data synchronization with DOA CROPIX
+ * Requires: npm install node-cron
+ */
+function setupDOADataSync(db, log) {
+  try {
+    const cron = require('node-cron');
+
+    // Run sync every morning at 2 AM
+    cron.schedule('0 2 * * *', async () => {
+      try {
+        if (log) log('Scheduled DOA data sync started...');
+        const response = await fetchFromDOAWithRetry('/production/all', {
+          year: new Date().getFullYear()
+        });
+        
+        // Store in database
+        for (const record of response) {
+          db.run(
+            `INSERT OR REPLACE INTO production_data 
+             (district, crop, season, year, month, production_mt, timestamp)
+             VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+            [record.district, record.crop, record.season, record.year, record.month, record.production_mt]
+          );
+        }
+        if (log) log('Daily sync completed successfully');
+        
+      } catch (error) {
+        if (log) log(`Scheduled sync failed: ${error.message}`, 'ERROR');
+      }
+    });
+
+    // Run sync every Monday for weekly seasonal targets
+    cron.schedule('0 6 * * 1', async () => {
+      try {
+        if (log) log('Scheduled seasonal targets sync started...');
+        const targets = await fetchFromDOAWithRetry('/seasonal-targets', {
+          year: new Date().getFullYear()
+        });
+        
+        for (const target of targets) {
+          db.run(
+            `INSERT OR REPLACE INTO seasonal_targets 
+             (district, crop, season, year, target_production_mt, achievability_percent)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [target.district, target.crop, target.season, target.year, target.target_mt, target.achievability_percent]
+          );
+        }
+        if (log) log('Weekly seasonal targets sync completed');
+        
+      } catch (error) {
+        if (log) log(`Seasonal targets sync failed: ${error.message}`, 'ERROR');
+      }
+    });
+
+    console.log('✅ DOA data synchronization scheduled');
+    
+  } catch (error) {
+    console.error('Failed to setup cron jobs:', error.message);
+  }
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint, setupAdminSyncEndpoint, fetchFromDOAWithRetry, initializeDOADatabase, setupDOALogging, setupDOADataSync };
