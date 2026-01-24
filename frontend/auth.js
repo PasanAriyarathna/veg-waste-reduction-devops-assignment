@@ -108,3 +108,69 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         loginSubmitBtn.textContent = 'Sign In';
     }
 });
+
+// ===== REGISTER FORM =====
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const regError = document.getElementById('regError');
+
+    // Reset error
+    regError.textContent = '';
+    regError.style.display = 'none';
+
+    // Client-side validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        regError.textContent = 'Please enter a valid email address.';
+        regError.style.display = 'block';
+        return;
+    }
+    if (password.length < 6) {
+        regError.textContent = 'Password must be at least 6 characters.';
+        regError.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name,
+                email,
+                phone,
+                password,
+                accountType: 'customer'
+            })
+        });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server not running. Please start the server with: node server.js');
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            regError.textContent = data.error || 'Registration failed. Please try again.';
+            regError.style.display = 'block';
+            return;
+        }
+
+        alert(`✅ Customer account created successfully!\n\nPlease login with your credentials.`);
+        toggleTab('loginTab');
+        document.getElementById('registerForm').reset();
+        // Pre-fill email for convenience
+        document.getElementById('loginEmail').value = email;
+
+    } catch (error) {
+        console.error('Error:', error);
+        regError.textContent = 'Network error. Please check your connection.';
+        regError.style.display = 'block';
+    }
+});
