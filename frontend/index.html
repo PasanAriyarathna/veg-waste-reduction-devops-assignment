@@ -23,6 +23,50 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
+    <section class="hero-new">
+        <div class="hero-left">
+            <h1 class="hero-title">Reducing Vegetable Wastage in Sri Lanka</h1>
+            <p class="hero-subtitle">We are bringing across South Central Agriculture supply chain visibility</p>
+            
+            <div class="cta-buttons">
+                <button class="btn-get-app" onclick="alert('iOS App Coming Soon')">
+                    <span style="font-size: 1.5em;">🍎</span>
+                </button>
+                <button class="btn-get-app" onclick="alert('Android App Coming Soon')">
+                    <span style="font-size: 1.5em;">🤖</span>
+                </button>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <span class="search-icon">📍</span>
+                    <input type="text" id="searchDistrict" placeholder="Your City" class="search-input">
+                    <button class="btn-search" onclick="searchByDistrict()">
+                        <span>🔍</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="image-grid mosaic">
+                <div class="image-item wide">
+                    <img src="images/beans.jpg" alt="Beans" loading="lazy" decoding="async">
+                </div>
+                <div class="image-item tall">
+                    <img src="images/leeks.jpeg" alt="Leeks" loading="lazy" decoding="async" onerror="this.src='images/Leeks.webp'">
+                </div>
+                <div class="image-item square">
+                    <img src="images/carrot.jpeg" alt="Carrot" loading="lazy" decoding="async">
+                </div>
+                <div class="image-item square">
+                    <img src="images/potato.jpg" alt="Potato" loading="lazy" decoding="async">
+                </div>
+            </div>
+        </div>
+    </section>
+
     <script src="app.js"></script>
 </body>
 </html>
