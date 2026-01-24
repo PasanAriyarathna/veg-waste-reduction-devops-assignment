@@ -182,4 +182,31 @@ function setupMonthlyTrendsEndpoint(app) {
   });
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint };
+/**
+ * Get all districts and their agro-climatic zones
+ * GET /api/doa/districts
+ */
+function setupDistrictsEndpoint(app) {
+  app.get('/api/doa/districts', async (req, res) => {
+    try {
+      const response = await axios.get(
+        `${DOA_API_CONFIG.baseUrl}/districts`,
+        {
+          headers: {
+            'Authorization': `Bearer ${DOA_API_CONFIG.authToken}`,
+            'X-API-Key': DOA_API_CONFIG.apiKey
+          },
+          timeout: DOA_API_CONFIG.timeout
+        }
+      );
+
+      res.json(response.data);
+
+    } catch (error) {
+      console.error('Error fetching districts:', error);
+      res.status(500).json({ error: 'Failed to fetch district list' });
+    }
+  });
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint, setupMonthlyTrendsEndpoint, setupDistrictsEndpoint };
