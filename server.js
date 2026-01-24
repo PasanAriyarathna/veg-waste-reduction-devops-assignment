@@ -410,4 +410,87 @@ app.get('/api/harvest/:vegetableId', (req, res) => {
     );
 });
 
+// Add harvest data (Agents only)
+app.post('/api/harvest', (req, res) => {
+    const { vegetableId, district, quantity, harvestDate, userId } = req.body;
+
+    if (!vegetableId || !district || !quantity || !harvestDate || !userId) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    db.get(`SELECT id, role, district as assignedDistrict FROM users WHERE id = ?`, [userId], (err, user) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!user || user.role !== 'agent') {
+            return res.status(403).json({ error: 'Only agents can add harvest data' });
+        }
+        if (String(user.assignedDistrict).toLowerCase() !== String(district).toLowerCase()) {
+            return res.status(403).json({ error: 'Agent can only update their assigned district' });
+        }
+
+        db.run(
+            `INSERT INTO harvest_data (vegetable_id, district, quantity, harvest_date, employee_id) 
+             VALUES (?, ?, ?, ?, ?)`,
+            [vegetableId, district, quantity, harvestDate, userId],
+            function(err2) {
+                if (err2) {
+                    return res.status(500).json({ error: 'Failed to add harvest data' });
+                }
+                res.json({ success: true, dataId: this.lastID });
+            }
+        );
+    });
+});
+
+// Update harvest data (Agents only)
+app.put('/api/harvest/:id', (req, res) => {
+    const { id } = req.params;
+    const { quantity, district, harvestDate, userId } = req.body;
+
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    db.get(`SELECT id, role, district as assignedDistrict FROM users WHERE id = ?`, [userId], (err, user) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!user || user.role !== 'agent') {
+            return res.status(403).json({ error: 'Only agents can update harvest data' });
+        }
+        if (String(user.assignedDistrict).toLowerCase() !== String(district).toLowerCase()) {
+            return res.status(403).json({ error: 'Agent can only update their assigned district' });
+        }
+        db.run(
+            `UPDATE harvest_data 
+             SET quantity = ?, district = ?, harvest_date = ?, updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?`,
+            [quantity, district, harvestDate, id],
+            (err2) => {
+                if (err2) {
+                    return res.status(500).json({ error: 'Failed to update harvest data' });
+                }
+                res.json({ success: true });
+            }
+        );
+    });
+});
+
+// Delete harvest data (Agents only)
+app.delete('/api/harvest/:id', (req, res) => {
+    const { id } = req.params;
+    const { userId, district } = req.body;
+
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    db.get(`SELECT id, role, district as assignedDistrict FROM users WHERE id = ?`, [userId], (err, user) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!user || user.role !== 'agent') {
+            return res.status(403).json({ error: 'Only agents can delete harvest data' });
+        }
+        if (district && String(user.assignedDistrict).toLowerCase() !== String(district).toLowerCase()) {
+            return res.status(403).json({ error: 'Agent can only modify their assigned district' });
+        }
+        db.run(`DELETE FROM harvest_data WHERE id = ?`, [id], (err2) => {
+            if (err2) {
+                return res.status(500).json({ error: 'Failed to delete harvest data' });
+            }
+            res.json({ success: true });
+        });
+    });
+});
+
 module.exports = { app, PORT, db, isValidEmail, isValidPassword };
