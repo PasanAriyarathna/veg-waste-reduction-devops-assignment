@@ -89,4 +89,35 @@ function setupDistrictProductionEndpoint(app) {
   });
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint };
+/**
+ * Fetch seasonal production targets
+ * GET /api/doa/seasonal-targets
+ * Query: ?zone=UpCountry&year=2025
+ */
+function setupSeasonalTargetsEndpoint(app) {
+  app.get('/api/doa/seasonal-targets', async (req, res) => {
+    try {
+      const { zone, year } = req.query;
+
+      const response = await axios.get(
+        `${DOA_API_CONFIG.baseUrl}/seasonal-targets`,
+        {
+          headers: {
+            'Authorization': `Bearer ${DOA_API_CONFIG.authToken}`,
+            'X-API-Key': DOA_API_CONFIG.apiKey
+          },
+          params: { zone, year },
+          timeout: DOA_API_CONFIG.timeout
+        }
+      );
+
+      res.json(response.data);
+
+    } catch (error) {
+      console.error('Error fetching seasonal targets:', error);
+      res.status(500).json({ error: 'Failed to fetch seasonal targets' });
+    }
+  });
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint };
