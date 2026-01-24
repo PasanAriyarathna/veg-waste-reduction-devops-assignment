@@ -207,6 +207,101 @@ app.get('/api/vegetables/:id', (req, res) => {
     );
 });
 
+// ===== HARVEST DATA APIs =====
+
+// 5. GET HARVEST DATA FOR A VEGETABLE (for chart)
+app.get('/api/harvest/:vegetableId', (req, res) => {
+    const { vegetableId } = req.params;
+
+    db.all(
+        `SELECT 
+            district, 
+            SUM(quantity) as total_quantity,
+            harvest_date
+         FROM harvest_data 
+         WHERE vegetable_id = ? 
+         GROUP BY district, harvest_date
+         ORDER BY harvest_date DESC`,
+        [vegetableId],
+        (err, data) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            res.json(data);
+        }
+    );
+});
+
+// 6. ADD HARVEST DATA (EMPLOYEES ONLY)
+app.post('/api/harvest', (req, res) => {
+    const { vegetableId, district, quantity, harvestDate, employeeId, employeeRole } = req.body;
+
+    // Check if user is an employee
+    if (employeeRole !== 'employee') {
+        return res.status(403).json({ error: 'Only employees can add harvest data' });
+    }
+
+    if (!vegetableId || !district || !quantity || !harvestDate) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    db.run(
+        `INSERT INTO harvest_data (vegetable_id, district, quantity, harvest_date, employee_id) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [vegetableId, district, quantity, harvestDate, employeeId],
+        function(err) {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to add harvest data' });
+            }
+            res.json({
+                success: true,
+                message: 'Harvest data added successfully',
+                dataId: this.lastID
+            });
+        }
+    );
+});
+
+// 7. UPDATE HARVEST DATA (EMPLOYEES ONLY)
+app.put('/api/harvest/:id', (req, res) => {
+    const { id } = req.params;
+    const { quantity, district, harvestDate, employeeRole } = req.body;
+
+    if (employeeRole !== 'employee') {
+        return res.status(403).json({ error: 'Only employees can update harvest data' });
+    }
+
+    db.run(
+        `UPDATE harvest_data 
+         SET quantity = ?, district = ?, harvest_date = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [quantity, district, harvestDate, id],
+        (err) => {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to update harvest data' });
+            }
+            res.json({ success: true, message: 'Harvest data updated successfully' });
+        }
+    );
+});
+
+// 8. DELETE HARVEST DATA (EMPLOYEES ONLY)
+app.delete('/api/harvest/:id', (req, res) => {
+    const { id } = req.params;
+    const { employeeRole } = req.body;
+
+    if (employeeRole !== 'employee') {
+        return res.status(403).json({ error: 'Only employees can delete harvest data' });
+    }
+
+    db.run(`DELETE FROM harvest_data WHERE id = ?`, [id], (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete harvest data' });
+        }
+        res.json({ success: true, message: 'Harvest data deleted successfully' });
+    });
+});
+
 // ===== SERVER START =====
 app.listen(PORT, () => {
     console.log(`
