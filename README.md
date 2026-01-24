@@ -122,3 +122,22 @@ npm start
 - `POST /api/auth/register` — Customer or employee (auto by district)
 - `POST /api/auth/login` — Login and receive role/district
 
+## CI/CD & Deployment
+
+### GitHub Actions
+- CI pipeline (`.github/workflows/ci.yml`): Node 18.x, 20.x matrix; npm install; audit (high severity)
+- Deploy workflow (`.github/workflows/deploy.yml`): build + deploy to production on main push
+
+### Deployment Options
+- **Render** (supported): Web Service with PORT env, `/tmp` SQLite copy for persistence
+
+## Challenges Faced
+- **CI/CD failures**: Node 16 EOL, missing system dependencies for native modules, strict npm audit blocking builds
+- **Vercel serverless crashes**: Needed to export Express app, guard `app.listen`, and copy SQLite to `/tmp` for writable storage
+- **Authentication errors**: 401s resolved by seeding default users; frontend null button errors fixed with proper element IDs
+- **SQLite persistence**: Read-only filesystem on serverless—mitigated with `/tmp` copy (note: data resets on redeploy)
+
+## Build status
+![CI Pipeline](https://github.com/PasanAriyarathna/veg-waste-reduction-devops-assignment/workflows/CI%20Pipeline/badge.svg)
+![Deploy](https://github.com/PasanAriyarathna/veg-waste-reduction-devops-assignment/workflows/Deploy%20to%20Production/badge.svg)
+
