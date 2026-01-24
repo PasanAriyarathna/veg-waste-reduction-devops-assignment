@@ -66,6 +66,25 @@ db.serialize(() => {
         )
     `);
 
+    // Seed default vegetables
+    const vegetables = [
+        { name: 'Spinach', emoji: '🥬', description: 'Leafy green vegetable' },
+        { name: 'Carrot', emoji: '🥕', description: 'Root vegetable' },
+        { name: 'Tomato', emoji: '🍅', description: 'Fruit vegetable' },
+        { name: 'Cabbage', emoji: '🥬', description: 'Cruciferous vegetable' },
+        { name: 'Bell Pepper', emoji: '🫑', description: 'Sweet pepper' },
+        { name: 'Onion', emoji: '🧅', description: 'Bulb vegetable' },
+        { name: 'Cucumber', emoji: '🥒', description: 'Gourd vegetable' },
+        { name: 'Broccoli', emoji: '🥦', description: 'Green cruciferous' }
+    ];
+
+    vegetables.forEach(veg => {
+        db.run(
+            `INSERT OR IGNORE INTO vegetables (name, emoji, description) VALUES (?, ?, ?)`,
+            [veg.name, veg.emoji, veg.description]
+        );
+    });
+
     console.log('✅ Database tables initialized');
 });
 
