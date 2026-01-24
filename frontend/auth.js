@@ -182,3 +182,12 @@ function logout() {
         window.location.href = 'index.html';
     }
 }
+
+// Set today's date as default in harvest form
+document.addEventListener('DOMContentLoaded', () => {
+    const dateInput = document.getElementById('harvestDate');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+});
