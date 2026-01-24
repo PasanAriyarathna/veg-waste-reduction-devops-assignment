@@ -18,3 +18,6 @@ function checkAuthOnPageLoad() {
         window.location.href = 'signin.html';
     }
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', checkAuthOnPageLoad);
