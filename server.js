@@ -206,4 +206,112 @@ app.post('/api/auth/login', (req, res) => {
     );
 });
 
+// ===== ADMIN AGENT MANAGEMENT APIs =====
+
+// Admin creates Agent
+app.post('/api/admin/create-agent', (req, res) => {
+    const { requesterId, email, password, name, phone, district } = req.body;
+
+    if (!requesterId) return res.status(401).json({ error: 'Unauthorized: missing requester' });
+    if (!email || !password || !name || !phone || !district) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    db.get(`SELECT role FROM users WHERE id = ?`, [requesterId], (err, requester) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!requester || requester.role !== 'admin') {
+            return res.status(403).json({ error: 'Only Admin can create agents' });
+        }
+
+        db.get(`SELECT COUNT(*) as count FROM users WHERE role = 'agent'`, (err2, cRow) => {
+            if (err2) return res.status(500).json({ error: 'Database error' });
+            if ((cRow?.count || 0) >= 25) {
+                return res.status(400).json({ error: 'Agent limit reached (25 districts)' });
+            }
+
+            db.get(`SELECT id FROM users WHERE role = 'agent' AND LOWER(district) = LOWER(?)`, [district], (err3, existing) => {
+                if (err3) return res.status(500).json({ error: 'Database error' });
+                if (existing) {
+                    return res.status(400).json({ error: 'An agent already monitors this district' });
+                }
+
+                db.run(`INSERT INTO users (email, password, name, phone, role, district) VALUES (?, ?, ?, ?, 'agent', ?)`,
+                    [email, password, name, phone, district],
+                    function(err4) {
+                        if (err4) {
+                            if (String(err4.message).toLowerCase().includes('unique')) {
+                                return res.status(400).json({ error: 'Email already exists' });
+                            }
+                            return res.status(500).json({ error: 'Failed to create agent' });
+                        }
+                        res.json({ success: true, agentId: this.lastID });
+                    }
+                );
+            });
+        });
+    });
+});
+
+// List all agents (Admin only)
+app.get('/api/admin/agents', (req, res) => {
+    const requesterId = Number(req.query.requesterId);
+    if (!requesterId) return res.status(401).json({ error: 'Unauthorized' });
+    db.get(`SELECT role FROM users WHERE id = ?`, [requesterId], (err, requester) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!requester || requester.role !== 'admin') {
+            return res.status(403).json({ error: 'Only Admin can view agents' });
+        }
+        db.all(`SELECT id, name, email, phone, district FROM users WHERE role = 'agent' ORDER BY district ASC`, (e2, rows) => {
+            if (e2) return res.status(500).json({ error: 'Database error' });
+            res.json(rows);
+        });
+    });
+});
+
+// Delete agent (Admin only)
+app.delete('/api/admin/agents/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    const { requesterId } = req.body;
+    
+    if (!requesterId) return res.status(401).json({ error: 'Unauthorized' });
+    
+    db.get(`SELECT role FROM users WHERE id = ?`, [requesterId], (err, requester) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!requester || requester.role !== 'admin') {
+            return res.status(403).json({ error: 'Only Admin can delete agents' });
+        }
+        
+        db.run(`DELETE FROM users WHERE id = ? AND role = 'agent'`, [agentId], function(err2) {
+            if (err2) return res.status(500).json({ error: 'Failed to delete agent' });
+            if (this.changes === 0) {
+                return res.status(404).json({ error: 'Agent not found' });
+            }
+            res.json({ success: true });
+        });
+    });
+});
+
+// Update agent (Admin only)
+app.put('/api/admin/agents/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    const { requesterId, district, name, phone } = req.body;
+    
+    if (!requesterId) return res.status(401).json({ error: 'Unauthorized' });
+    
+    db.get(`SELECT role FROM users WHERE id = ?`, [requesterId], (err, requester) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!requester || requester.role !== 'admin') {
+            return res.status(403).json({ error: 'Only Admin can update agents' });
+        }
+        
+        db.run(`UPDATE users SET district = ?, name = ?, phone = ? WHERE id = ? AND role = 'agent'`, 
+            [district, name, phone, agentId], 
+            function(err2) {
+                if (err2) return res.status(500).json({ error: 'Failed to update agent' });
+                res.json({ success: true });
+            }
+        );
+    });
+});
+
 module.exports = { app, PORT, db, isValidEmail, isValidPassword };
