@@ -21,18 +21,11 @@ jobs:
     - name: Install dependencies
       run: npm install
     
-    - name: Install backend dependencies
+    - name: Verify dependencies
       run: |
-        cd backend
-        npm install
-        cd ..
-    
-    - name: Build & Verify
-      run: |
-        echo "Build verification:"
-        echo "✅ Backend: $(test -f backend/server.js && echo 'Ready' || echo 'Missing')"
-        echo "✅ Frontend: $(test -d frontend && echo 'Ready' || echo 'Missing')"
-        echo "✅ Database config: $(test -f backend/server.js && echo 'Configured' || echo 'Not configured')"
+        echo "Verifying dependencies..."
+        npm list --depth=0
+        node --version
     
     - name: Deploy to production
       env:
