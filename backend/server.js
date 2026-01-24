@@ -85,6 +85,49 @@ db.serialize(() => {
         );
     });
 
+    // Seed default users if missing (admin, two agents, one customer)
+    const defaultUsers = [
+        {
+            email: 'admin@mail.com',
+            password: 'admin123',
+            name: 'System Admin',
+            phone: '0700000000',
+            role: 'admin',
+            district: null
+        },
+        {
+            email: 'farmer@colombo.com',
+            password: 'farm123',
+            name: 'Colombo Farmer',
+            phone: '0701234567',
+            role: 'employee',
+            district: 'Colombo'
+        },
+        {
+            email: 'farmer@galle.com',
+            password: 'farm123',
+            name: 'Galle Farmer',
+            phone: '0712345678',
+            role: 'employee',
+            district: 'Galle'
+        },
+        {
+            email: 'customer@mail.com',
+            password: 'cust123',
+            name: 'John Customer',
+            phone: '0723456789',
+            role: 'customer',
+            district: null
+        }
+    ];
+
+    defaultUsers.forEach(user => {
+        db.run(
+            `INSERT OR IGNORE INTO users (email, password, name, phone, role, district) VALUES (?, ?, ?, ?, ?, ?)`,
+            [user.email, user.password, user.name, user.phone, user.role, user.district]
+        );
+    });
+
     console.log('✅ Database tables initialized');
 });
 
