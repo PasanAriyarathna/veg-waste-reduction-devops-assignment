@@ -11,3 +11,21 @@ The Vegetable Wastage Reduction System is a web application designed to track an
 ## Live Deployment
 🔗 **Live URL:** https://veg-waste-reduction-devops-assignment.onrender.com/
 
+## Technologies Used
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
+- **Backend:** Node.js, Express.js
+- **Database:** SQLite3
+- **DevOps:** GitHub Actions (CI/CD)
+- **Deployment:** Render
+- **Version Control:** Git, GitHub
+
+## Features
+- 🔐 User authentication (Admin, Employee, Customer roles)
+- 📊 Real-time harvest data tracking by district
+- 📈 Production trend visualization
+- 🗺️ District-wise analytics
+- 🌱 Seasonal data management
+- 📱 Responsive mobile design
+- 🔄 Automated CI/CD pipeline
+- 🚀 One-click cloud deployment
+
