@@ -42,10 +42,17 @@ jobs:
         echo "Deploying to $DEPLOY_USER@$DEPLOY_HOST"
     
     - name: Health check
+      env:
+        DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       run: |
         echo "✅ Deployment complete"
-        echo "Next step: SSH to server and restart service"
-        echo "Command: ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'cd veg-waste-reduction && npm start'"
+        if [ -n "$DEPLOY_USER" ] && [ -n "$DEPLOY_HOST" ]; then
+          echo "Next step: SSH to server and restart service"
+          echo "Command: ssh $DEPLOY_USER@$DEPLOY_HOST 'cd veg-waste-reduction && npm start'"
+        else
+          echo "⚠️  Deployment completed but secrets not configured for remote access"
+        fi
 
   notification:
     needs: deploy
@@ -54,8 +61,11 @@ jobs:
     steps:
     - name: Deploy notification
       run: |
-        if [ "${{ needs.deploy.result }}" == "success" ]; then
+        DEPLOY_RESULT="${{ needs.deploy.result }}"
+        if [ "$DEPLOY_RESULT" == "success" ]; then
           echo "✅ Deployment successful"
+          exit 0
         else
-          echo "❌ Deployment failed"
+          echo "❌ Deployment failed (result: $DEPLOY_RESULT)"
+          exit 0
         fi
