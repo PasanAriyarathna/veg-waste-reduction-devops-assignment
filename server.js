@@ -387,4 +387,27 @@ app.get('/api/harvest', (req, res) => {
     });
 });
 
+// Get harvest data for a vegetable (for chart)
+app.get('/api/harvest/:vegetableId', (req, res) => {
+    const { vegetableId } = req.params;
+
+    db.all(
+        `SELECT 
+            district, 
+            SUM(quantity) as total_quantity,
+            harvest_date
+         FROM harvest_data 
+         WHERE vegetable_id = ? 
+         GROUP BY district, harvest_date
+         ORDER BY harvest_date DESC`,
+        [vegetableId],
+        (err, data) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            res.json(data);
+        }
+    );
+});
+
 module.exports = { app, PORT, db, isValidEmail, isValidPassword };
