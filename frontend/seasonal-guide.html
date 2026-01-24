@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Lanka Cultivation & Harvest Guide - VegWaste</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .guide-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .guide-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--primary-green);
+        }
+
+        .guide-section h2 {
+            color: var(--primary-green);
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .guide-section h3 {
+            color: var(--primary-green);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .season-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .season-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .season-card h4 {
+            color: var(--primary-green);
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .season-card p {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .zone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .zone-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--light-green);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .zone-box h4 {
+            color: var(--primary-green);
+            font-size: 1.15em;
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .zone-box .subtitle {
+            color: var(--light-green);
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .zone-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .zone-box li {
+            padding: 8px 0;
+            color: #666;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.95em;
+        }
+
+        .zone-box li:last-child {
+            border-bottom: none;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .highlight-box strong {
+            color: var(--primary-green);
+        }
+
+        .stats-boxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 2.5em;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            margin-top: 10px;
+            opacity: 0.95;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .info-table th {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .info-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        .info-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .loss-causes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .loss-item {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .loss-item h5 {
+            color: #e67e22;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .loss-item p {
+            color: #333;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .api-section {
+            background: linear-gradient(135deg, #e8f4ff 0%, #d1ecf1 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-blue);
+            margin-top: 20px;
+        }
+
+        .api-section h4 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .api-section p {
+            color: #333;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .season-cards,
+            .zone-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .guide-section {
+                padding: 25px;
+            }
+
+            .guide-section h2 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="emoji">🥬</span>
+                <span class="text">VegWaste Sri Lanka</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="signin.html" class="nav-link">Sign In</a>
+                <a href="category.html" class="nav-link">Categories</a>
+                <a href="seasonal-guide.html" class="nav-link active">Seasons Guide</a>
+                <a href="seasonal-tracking.html" class="nav-link">Season Map</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="guide-container">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 50px;">
+            <h1 style="color: var(--primary-green); font-family: 'Playfair Display', serif; font-size: 3em; margin-bottom: 15px;">🌾 Sri Lanka Cultivation & Harvest Guide</h1>
+            <p style="color: #666; font-size: 1.1em; font-family: 'Inter', sans-serif; max-width: 700px; margin: 0 auto;">Practical insights into vegetable seasons, growing areas, post-harvest management, and agricultural resources</p>
+        </div>
+
+        <!-- Section 1: National Seasons -->
+        <div class="guide-section">
+            <h2>📅 National Cultivation Seasons</h2>
+            <p style="color: #666; line-height: 1.8; margin-bottom: 25px;">Sri Lanka follows two main national cultivation seasons linked with monsoon patterns. Vegetables are grown in both seasons, but planting and harvest timing vary based on agro-climatic zones, irrigation availability, and local rainfall patterns.</p>
+
+            <div class="season-cards">
+                <div class="season-card">
+                    <h4>🌧️ Maha Season</h4>
+                    <p><strong>Duration:</strong> September → March</p>
+                    <p><strong>Linked with:</strong> North-East monsoon</p>
+                    <p><strong>Characteristics:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px; color: #666;">
+                        <li>Primary cultivation season across Sri Lanka</li>
+                        <li>Peak planting and harvesting period</li>
+                        <li>Up-country vegetables flourish due to cooler temperatures</li>
+                        <li>Favorable rainfall for rain-fed agriculture</li>
+                    </ul>
+                </div>
+
+                <div class="season-card">
+                    <h4>☀️ Yala Season</h4>
+                    <p><strong>Duration:</strong> May → End of August</p>
+                    <p><strong>Linked with:</strong> Dry period (SW monsoon influence)</p>
+                    <p><strong>Characteristics:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px; color: #666;">
+                        <li>Heavily irrigation-dependent season</li>
+                        <li>Strong production in low-country zones</li>
+                        <li>Suitable for warm-climate vegetables</li>
+                        <li>Inter-season cultivation in some areas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <p>
+                    <strong>⚠️ Important Note:</strong> Some areas practice short "inter-season" cultivation (April-May, September) between Maha and Yala, using stored soil moisture and early rains. Actual planting and harvest timing varies significantly by district based on local climate patterns.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 2: Growing Zones -->
+        <div class="guide-section">
+            <h2>📍 Major Vegetable Growing Zones</h2>
+            <p style="color: #666; line-height: 1.8; margin-bottom: 25px;">Cultivation patterns vary by agro-climatic zone. Sri Lanka is divided into Up-country, Mid-country, and Low-country regions with distinct climate and irrigation profiles. Additionally, rainfall pattern classifications (Wet, Intermediate, Dry zones) influence farming practices.</p>
+
+            <h3>❄️ Up-Country (Cool Climate Belt)</h3>
+            <p style="color: #666; margin-bottom: 15px;"><strong style="color: var(--primary-green);">Prime Vegetable Production Hub:</strong> These regions account for the largest share of seasonal vegetable cultivation nationally, with Badulla, Kandy, and Matale highlighted as leading agricultural districts.</p>
+
+            <div class="zone-grid">
+                <div class="zone-box">
+                    <h4>📍 Nuwara Eliya</h4>
+                    <div class="subtitle">Highest elevation zone</div>
+                    <ul>
+                        <li>✓ Potato (primary crop)</li>
+                        <li>✓ Carrot</li>
+                        <li>✓ Green beans</li>
+                        <li>✓ Leeks</li>
+                        <li>✓ Cabbage</li>
+                        <li><strong>Peak Season:</strong> Maha (Sep-Mar)</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>📍 Badulla</h4>
+                    <div class="subtitle">Important vegetable hub</div>
+                    <ul>
+                        <li>✓ Beans (green, climbing)</li>
+                        <li>✓ Carrot</li>
+                        <li>✓ Potato</li>
+                        <li>✓ Onion</li>
+                        <li>✓ Tomato</li>
+                        <li><strong>Peak Season:</strong> Maha (Sep-Mar)</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>📍 Kandy</h4>
+                    <div class="subtitle">Central highlands region</div>
+                    <ul>
+                        <li>✓ Cabbage</li>
+                        <li>✓ Beetroot</li>
+                        <li>✓ Beans</li>
+                        <li>✓ Potato</li>
+                        <li>✓ Leafy greens</li>
+                        <li><strong>Peak Season:</strong> Maha (Sep-Mar)</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>📍 Matale</h4>
+                    <div class="subtitle">Mid-country leading district</div>
+                    <ul>
+                        <li>✓ Carrot</li>
+                        <li>✓ Cabbage</li>
+                        <li>✓ Beans</li>
+                        <li>✓ Onion</li>
+                        <li>✓ Tomato</li>
+                        <li><strong>Peak Season:</strong> Maha (Sep-Mar)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <p>
+                    <strong>Key Insight:</strong> Up-country vegetables reach peak production during Maha season (Sep-Mar) due to excellent cool climate conditions and monsoon rainfall. These regions supply most of the country's temperate-climate vegetables. Production capacity drops during Yala due to dry conditions, though limited cultivation continues with irrigation.
+                </p>
+            </div>
+
+            <h3>🌡️ Low-Country (Warm Climate - Wide Geographic Spread)</h3>
+            <p style="color: #666; margin-bottom: 15px;"><strong style="color: var(--primary-green);">Distribution:</strong> Grown across many districts in Dry and Intermediate zones. These regions support year-round cultivation with irrigation infrastructure. Most cultivated vegetables: <strong>Brinjal, Long Beans, Pumpkin, Okra</strong></p>
+
+            <div class="zone-grid">
+                <div class="zone-box">
+                    <h4>🏙️ Western Province</h4>
+                    <div class="subtitle">High demand zone</div>
+                    <ul>
+                        <li>Colombo District</li>
+                        <li>Gampaha District</li>
+                        <li>Kalutara District</li>
+                        <li>Vegetables: Brinjal, okra, tomato, long beans</li>
+                        <li><strong>Year-round production</strong> with irrigation</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>🌴 Sabaragamuwa Province</h4>
+                    <div class="subtitle">Wet zone agriculture</div>
+                    <ul>
+                        <li>Ratnapura District</li>
+                        <li>Kegalle District</li>
+                        <li>Vegetables: Long beans, okra, pumpkin, brinjal</li>
+                        <li><strong>Continuous supply</strong> with irrigation</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>🏖️ Eastern Province</h4>
+                    <div class="subtitle">Dry zone irrigation</div>
+                    <ul>
+                        <li>Jaffna, Mullaitivu, Batticaloa</li>
+                        <li>Trincomalee, Ampara</li>
+                        <li>Vegetables: Tomato, okra, long beans, brinjal</li>
+                        <li><strong>Irrigation-dependent</strong> cultivation</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>🌊 Southern Province</h4>
+                    <div class="subtitle">Dry zone vegetables</div>
+                    <ul>
+                        <li>Matara, Galle, Hambantota</li>
+                        <li>Moneragala</li>
+                        <li>Vegetables: Pumpkin, cucumber, brinjal, okra</li>
+                        <li><strong>Seasonal and irrigation</strong> based production</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>🌾 North Central Province</h4>
+                    <div class="subtitle">Ancient irrigation zone</div>
+                    <ul>
+                        <li>Anuradhapura District</li>
+                        <li>Polonnaruwa District</li>
+                        <li>Vegetables: Onion, tomato, long beans, okra</li>
+                        <li><strong>Traditional tank irrigation</strong> systems</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>🌱 North Western Province</h4>
+                    <div class="subtitle">Mixed agriculture</div>
+                    <ul>
+                        <li>Kurunegala District</li>
+                        <li>Puttalam District</li>
+                        <li>Vegetables: Tomato, okra, long beans, onion</li>
+                        <li><strong>Seasonal fluctuations</strong> with rainfall</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🍅 Multi-Zone Vegetables</h3>
+            <p style="color: #666; margin-bottom: 15px;"><strong style="color: var(--primary-green);">Cultivated Across All Zones</strong> with proper management:</p>
+
+            <table class="info-table">
+                <thead>
+                    <tr>
+                        <th>Vegetable</th>
+                        <th>Geographic Suitability</th>
+                        <th>Key Factor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>🍅 Tomato</strong></td>
+                        <td>All agro-climatic zones (with climate adjustments)</td>
+                        <td>Variety selection & irrigation management</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🧅 Onion</strong></td>
+                        <td>Most zones (mostly imported varieties)</td>
+                        <td>Cool season planting; storage availability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🥕 Root Vegetables</strong></td>
+                        <td>Wide adaptability across zones</td>
+                        <td>Soil quality & irrigation consistency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🥬 Leafy Greens</strong></td>
+                        <td>Year-round potential in all zones</td>
+                        <td>Water availability & pest management</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 3: Post-Harvest Loss -->
+        <div class="guide-section">
+            <h2>⚠️ Vegetable Post-Harvest Loss in Sri Lanka</h2>
+            <p style="color: #666; line-height: 1.8; margin-bottom: 25px;">Post-harvest loss remains a significant challenge in Sri Lanka's agricultural supply chain. Understanding where losses occur is critical for improving food security and farmer income.</p>
+
+            <h3>Loss Statistics</h3>
+            <div class="stats-boxes">
+                <div class="stat-box">
+                    <div class="number">20-30%</div>
+                    <div class="label">Vegetable Post-Harvest Loss (2025 study)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">30-35%</div>
+                    <div class="label">Overall Fruits & Vegetables Loss</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">40%</div>
+                    <div class="label">Loss in worst conditions</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">2</div>
+                    <div class="label">Main Seasons (Maha/Yala)</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 35px;">Common Loss Causes</h3>
+            <div class="loss-causes">
+                <div class="loss-item">
+                    <h5>🚚 Transport Damage</h5>
+                    <p>Poor packaging and over-stacking during transportation causes significant losses across the supply chain. Inadequate containers and rough handling contribute heavily.</p>
+                </div>
+                <div class="loss-item">
+                    <h5>🌡️ Temperature Exposure</h5>
+                    <p>Lack of cold chain infrastructure leads to spoilage, especially in warm climates of low-country zones. Many vegetables require temperature-controlled storage and transport.</p>
+                </div>
+                <div class="loss-item">
+                    <h5>🏪 Wholesale/Retail Handling</h5>
+                    <p>Poor storage practices and handling at markets and retail points contribute significantly to quality degradation. Extended display times without proper cooling increase losses.</p>
+                </div>
+                <div class="loss-item">
+                    <h5>📦 Inadequate Storage</h5>
+                    <p>Insufficient storage facilities with improper temperature and humidity control accelerate deterioration. Farm-level storage is often basic and inadequate.</p>
+                </div>
+                <div class="loss-item">
+                    <h5>🐛 Pest & Disease</h5>
+                    <p>Post-harvest pests and fungal diseases thrive without proper storage management. Lack of fumigation and pest control measures increases losses.</p>
+                </div>
+                <div class="loss-item">
+                    <h5>⏰ Time Delays</h5>
+                    <p>Extended time between harvest and market sale, especially in remote areas, leads to quality loss. Poor market access and transportation networks increase delays.</p>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 25px;">
+                <p>
+                    <strong>🎯 Opportunity:</strong> Improving post-harvest management, cold chain infrastructure, proper packaging, and farmer training could reduce losses by 10-15%, significantly boosting farmer income and food availability.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 4: API Resources -->
+        <div class="guide-section">
+            <h2>🔗 Agricultural Data Sources & APIs</h2>
+            <p style="color: #666; line-height: 1.8; margin-bottom: 25px;">Several official sources provide agricultural data that can enhance your platform with real, production data.</p>
+
+            <h3>A) DOA CROPIX Platform (Recommended)</h3>
+            <div class="api-section">
+                <h4>🏛️ Department of Agriculture (DOA) CROPIX</h4>
+                <p><strong>Status:</strong> Official open data platform for Sri Lankan agriculture</p>
+                <p><strong>What it provides:</strong> Crop production data, district-wise cultivation statistics, monthly production reports, seasonal targets, crop-specific information</p>
+                <p><strong>How to integrate:</strong></p>
+                <div class="code-block">
+// Example API structure (requires DOA registration)
+GET /api/crops?district=Badulla&season=Maha&year=2025
+GET /api/production?crop=Potato&district=Nuwara%20Eliya&month=January
+GET /api/seasonal-targets?zone=UpCountry
+                </div>
+                <p style="margin-top: 10px;"><strong>Next Steps:</strong></p>
+                <ul style="padding-left: 20px; color: #666;">
+                    <li>Register at DOA CROPIX platform</li>
+                    <li>Request API access (auth token)</li>
+                    <li>Implement district-wise production fetching</li>
+                    <li>Cache data locally for performance</li>
+                </ul>
+            </div>
+
+            <h3 style="margin-top: 30px;">B) Sri Lanka Open Data Portal</h3>
+            <div class="api-section">
+                <h4>📊 data.gov.lk (DKAN API)</h4>
+                <p><strong>Status:</strong> National open data repository</p>
+                <p><strong>Available datasets:</strong> Agricultural statistics, harvest data, district information, seasonal reports</p>
+                <p><strong>API Structure:</strong></p>
+                <div class="code-block">
+GET https://data.gov.lk/api/3/action/datastore_search?resource_id=RESOURCE_ID
+GET https://data.gov.lk/api/3/action/package_list
+                </div>
+                <p style="margin-top: 10px;"><strong>Note:</strong> Some endpoints may experience availability issues (502 errors). Use as backup source.</p>
+            </div>
+
+            <h3 style="margin-top: 30px;">Recommended Data Integration Approach</h3>
+            <div class="zone-grid">
+                <div class="zone-box">
+                    <h4>📈 District-wise Monthly Production</h4>
+                    <ul>
+                        <li>Fetch via DOA CROPIX API</li>
+                        <li>Update monthly or bi-weekly</li>
+                        <li>Cache in local database</li>
+                        <li>Display on district tracking page</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>🌾 Seasonal Production Targets</h4>
+                    <ul>
+                        <li>Pull Maha/Yala season targets</li>
+                        <li>Compare actual vs targets</li>
+                        <li>Show on seasonal tracking page</li>
+                        <li>Alert on significant variations</li>
+                    </ul>
+                </div>
+
+                <div class="zone-box">
+                    <h4>🗺️ Agro-Climatic Zone Data</h4>
+                    <ul>
+                        <li>Map districts to zones</li>
+                        <li>Show zone-specific recommendations</li>
+                        <li>Highlight suitable vegetables</li>
+                        <li>Provide irrigation information</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Guide -->
+        <div class="guide-section">
+            <h2>🛠️ Implementation Guidance for Your Platform</h2>
+            <p style="color: #666; line-height: 1.8; margin-bottom: 25px;">To integrate real agricultural data into your VegWaste platform:</p>
+
+            <h3>Step 1: Register with DOA CROPIX</h3>
+            <ul style="color: #666; padding-left: 20px; line-height: 1.9;">
+                <li>Visit DOA CROPIX registration page</li>
+                <li>Apply for API access token</li>
+                <li>Document base URL and authentication method</li>
+                <li>Test API endpoints in staging environment</li>
+            </ul>
+
+            <h3>Step 2: Update Node.js Backend</h3>
+            <p style="color: #666;">Create API endpoints that fetch and cache DOA data:</p>
+            <div class="code-block">
+// server.js - New endpoint for district production
+app.get('/api/district-production/:district/:season/:year', async (req, res) => {
+  try {
+    const { district, season, year } = req.params;
+    
+    // Check cache first
+    const cached = cache.get(`production_${district}_${season}_${year}`);
+    if (cached) return res.json(cached);
+    
+    // Fetch from DOA CROPIX API
+    const response = await fetch(`${DOA_API}/production`, {
+      headers: { 'Authorization': `Bearer ${DOA_TOKEN}` },
+      qs: { district, season, year }
+    });
+    
+    const data = await response.json();
+    cache.set(`production_${district}_${season}_${year}`, data);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+            </div>
+
+            <h3>Step 3: Update Frontend Display</h3>
+            <p style="color: #666;">Fetch and display data on seasonal-tracking page:</p>
+            <div class="code-block">
+// Fetch real production data
+fetch('/api/district-production/Badulla/maha/2025')
+  .then(r => r.json())
+  .then(data => {
+    updateDistrictCard('Badulla', data.production);
+    updateMapMarkers(data);
+  });
+            </div>
+
+            <h3>Step 4: Add Real-Time Updates</h3>
+            <ul style="color: #666; padding-left: 20px; line-height: 1.9;">
+                <li>Schedule API calls for monthly data refresh</li>
+                <li>Display "Last Updated" timestamp</li>
+                <li>Show actual vs target comparison</li>
+                <li>Alert users about significant variations</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer style="background: var(--primary-green); color: white; text-align: center; padding: 30px; margin-top: 40px;">
+        <p>&copy; 2026 VegWaste Sri Lanka. Supporting sustainable vegetable production with practical cultivation insights.</p>
+    </footer>
+</body>
+</html>
