@@ -29,11 +29,13 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: npm install --legacy-peer-deps --no-audit
       continue-on-error: true
+      timeout-minutes: 10
     
     - name: Run linter (if configured)
       run: npm run lint --if-present
+      timeout-minutes: 5
     
     - name: Run tests
       run: npm test --if-present
@@ -59,11 +61,17 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18.x'
+        cache: 'npm'
     
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: npm install --legacy-peer-deps --no-audit
       continue-on-error: true
+      timeout-minutes: 10
+    
     - name: Run npm audit
       run: npm audit --audit-level=high || true
+      timeout-minutes: 5
+    
     - name: Check for critical vulnerabilities
       run: npm list --depth=0 || true
+      timeout-minutes: 5

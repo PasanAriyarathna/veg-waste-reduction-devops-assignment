@@ -24,14 +24,16 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: npm install --legacy-peer-deps --no-audit
       continue-on-error: true
+      timeout-minutes: 10
     
     - name: Verify dependencies
       run: |
         echo "Verifying dependencies..."
         npm list --depth=0 || true
         node --version
+      timeout-minutes: 5
     
     - name: Deploy to production
       env:
