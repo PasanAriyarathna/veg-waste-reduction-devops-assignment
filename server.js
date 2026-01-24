@@ -314,4 +314,35 @@ app.put('/api/admin/agents/:agentId', (req, res) => {
     });
 });
 
+// ===== VEGETABLE CATEGORIES APIs =====
+
+// Get all vegetables
+app.get('/api/vegetables', (req, res) => {
+    db.all(`SELECT * FROM vegetables`, (err, vegetables) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(vegetables);
+    });
+});
+
+// Get single vegetable
+app.get('/api/vegetables/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.get(
+        `SELECT * FROM vegetables WHERE id = ?`,
+        [id],
+        (err, vegetable) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            if (!vegetable) {
+                return res.status(404).json({ error: 'Vegetable not found' });
+            }
+            res.json(vegetable);
+        }
+    );
+});
+
 module.exports = { app, PORT, db, isValidEmail, isValidPassword };
