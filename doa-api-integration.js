@@ -120,4 +120,35 @@ function setupSeasonalTargetsEndpoint(app) {
   });
 }
 
-module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint };
+/**
+ * Fetch crop-specific information
+ * GET /api/doa/crops
+ * Query: ?crop=Potato&district=Badulla&season=Maha
+ */
+function setupCropsEndpoint(app) {
+  app.get('/api/doa/crops', async (req, res) => {
+    try {
+      const { crop, district, season } = req.query;
+
+      const response = await axios.get(
+        `${DOA_API_CONFIG.baseUrl}/crops`,
+        {
+          headers: {
+            'Authorization': `Bearer ${DOA_API_CONFIG.authToken}`,
+            'X-API-Key': DOA_API_CONFIG.apiKey
+          },
+          params: { crop, district, season },
+          timeout: DOA_API_CONFIG.timeout
+        }
+      );
+
+      res.json(response.data);
+
+    } catch (error) {
+      console.error('Error fetching crop data:', error);
+      res.status(500).json({ error: 'Failed to fetch crop data' });
+    }
+  });
+}
+
+module.exports = { DOA_API_CONFIG, apiCache, setupDistrictProductionEndpoint, setupSeasonalTargetsEndpoint, setupCropsEndpoint };
