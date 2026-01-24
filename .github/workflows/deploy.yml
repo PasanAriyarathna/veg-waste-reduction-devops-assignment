@@ -47,6 +47,7 @@ jobs:
         fi
         echo "Deployment would happen here"
         echo "Deploying to $DEPLOY_USER@$DEPLOY_HOST"
+      timeout-minutes: 10
     
     - name: Health check
       env:
@@ -60,6 +61,7 @@ jobs:
         else
           echo "⚠️  Deployment completed but secrets not configured for remote access"
         fi
+      timeout-minutes: 5
 
   notification:
     needs: deploy
@@ -75,3 +77,4 @@ jobs:
         else
           echo "❌ Deployment failed (result: $DEPLOY_RESULT)"
         fi
+      timeout-minutes: 5
