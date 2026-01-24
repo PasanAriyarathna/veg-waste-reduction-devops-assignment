@@ -29,3 +29,13 @@ The Vegetable Wastage Reduction System is a web application designed to track an
 - 🔄 Automated CI/CD pipeline
 - 🚀 One-click cloud deployment
 
+## Branch Strategy
+We implemented a professional Git workflow:
+- `main` — Production branch (protected, requires PRs)
+- `develop` — Integration branch for testing
+- `feature/*` — Individual feature branches
+	- `feature/frontend-ui` — Frontend UI development
+	- `feature/backend-api` — Backend API development
+	- `feature/devops-pipeline` — CI/CD pipeline setup
+- `docs/readme` — Edit readme file
+
