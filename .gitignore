@@ -1,0 +1,14 @@
+node_modules/
+*.db
+.env
+.DS_Store
+dist/
+build/
+*.log
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cache/
+coverage/
