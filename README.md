@@ -46,7 +46,7 @@ We implemented a professional Git workflow:
 - Repository initialization and GitHub configuration
 - GitHub Actions CI/CD pipeline setup
 	- `.github/workflows/ci.yml` — Node.js matrix testing (18.x, 20.x), install hardening, audit
-	- `.github/workflows/deploy.yml` — Vercel auto-deployment with secrets checks
+	- `.github/workflows/deploy.yml` — Production deployment workflow for Render
 	- Security audit with high severity threshold
 - Branch protection rules on `main` and `develop`
 - Deployment platform setup (Render configuration)
@@ -134,7 +134,6 @@ npm start
 
 ## Challenges Faced
 - **CI/CD failures**: Node 16 EOL, missing system dependencies for native modules, strict npm audit blocking builds
-- **Vercel serverless crashes**: Needed to export Express app, guard `app.listen`, and copy SQLite to `/tmp` for writable storage
 - **Authentication errors**: 401s resolved by seeding default users; frontend null button errors fixed with proper element IDs
 - **SQLite persistence**: Read-only filesystem on serverless—mitigated with `/tmp` copy (note: data resets on redeploy)
 
