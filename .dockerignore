@@ -1,0 +1,47 @@
+# .dockerignore – Vegetable Wastage Reduction System
+# Excludes unnecessary files from Docker build context
+# to reduce image size and prevent leaking sensitive data.
+
+# Dependencies (rebuilt inside container)
+node_modules/
+
+# Version control
+.git/
+.gitignore
+.github/
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artefacts
+dist/
+build/
+.cache/
+coverage/
+
+# Runtime database (created at runtime, not baked into image)
+*.db
+
+# Secrets
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
