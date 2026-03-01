@@ -1,0 +1,52 @@
+# ==========================================================
+# docker-compose.yml – Vegetable Wastage Reduction System
+# ==========================================================
+# Run the full stack:  docker compose up --build
+# Uses SQLite (file-based), so no separate DB container needed.
+# A named volume persists the database across restarts.
+# ==========================================================
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: veg-waste-app
+
+    # Host port (configurable) → container port.
+    ports:
+      - "${APP_PORT:-3000}:3000"
+
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+
+    # Persistent volume for the SQLite database.
+    volumes:
+      - veg-db-data:/app/data
+
+    networks:
+      - veg-network
+
+    restart: unless-stopped
+
+    # Resource limits to protect the host.
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+# Isolated bridge network for the application.
+networks:
+  veg-network:
+    driver: bridge
+
+# Named volume – data survives container removal/recreation.
+volumes:
+  veg-db-data:
+    driver: local

@@ -132,6 +132,78 @@ npm start
 ### Deployment Options
 - **Render** (supported): Web Service with PORT env, `/tmp` SQLite copy for persistence
 
+## Docker Containerisation
+
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/) (v20.10 or later)
+- [Docker Compose](https://docs.docker.com/compose/install/) (v2.0 or later; included with Docker Desktop)
+
+### Project Structure (Docker files)
+
+| File | Purpose |
+|---|---|
+| `Dockerfile` | Multi-stage build definition for the application container |
+| `docker-compose.yml` | Service orchestration for the full application stack |
+| `.dockerignore` | Excludes unnecessary files from the Docker build context |
+| `docker-entrypoint.sh` | Symlinks SQLite database to persistent Docker volume |
+
+### Building and Running
+
+**Start the entire application stack with a single command:**
+
+```bash
+docker compose up --build
+```
+
+The application will be available at **http://localhost:3000**.
+
+**Run in detached (background) mode:**
+
+```bash
+docker compose up --build -d
+```
+
+**Stop the application:**
+
+```bash
+docker compose down
+```
+
+**Stop and remove all data (including the database volume):**
+
+```bash
+docker compose down -v
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `APP_PORT` | `3000` | Host port mapped to the application container |
+| `NODE_ENV` | `production` | Node.js environment mode |
+| `PORT` | `3000` | Internal port the Express server listens on |
+
+To use a different host port (e.g. 8080):
+
+```bash
+APP_PORT=8080 docker compose up --build
+```
+
+### Building the Docker Image Manually
+
+```bash
+docker build -t veg-waste-app .
+docker run -p 3000:3000 -v veg-db-data:/app/data veg-waste-app
+```
+
+### Docker Architecture
+- **Base image:** `node:18-alpine` — lightweight Alpine Linux image (~5 MB base)
+- **Multi-stage build:** separates build-time and runtime dependencies, reducing final image size
+- **Non-root user:** application runs as an unprivileged user (`appuser`) for security
+- **Health check:** container auto-restarts if the application becomes unresponsive
+- **dumb-init:** proper PID 1 signal handling for graceful shutdowns
+- **Named volume (`veg-db-data`):** persists the SQLite database across container restarts
+
 ## Challenges Faced
 - **CI/CD failures**: Node 16 EOL, missing system dependencies for native modules, strict npm audit blocking builds
 - **Vercel serverless crashes**: Needed to export Express app, guard `app.listen`, and copy SQLite to `/tmp` for writable storage
